@@ -1,0 +1,9 @@
+{"DESIGN_NAME": "Encoder",
+"VERILOG_FILES": "dir::../RTL/Encoder.v",
+"CLOCK_PORT": "clk",
+"CLOCK_PERIOD": 10,
+"FP_SIZING": "absolute",
+"DIE_AREA": "0 0 50 50",
+"VDD_NETS": ["vdd"],
+"GND_NETS": ["vss"]
+}

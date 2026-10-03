@@ -1,0 +1,23 @@
+{
+    "DESIGN_NAME": "FIFO",
+    "VERILOG_FILES": [
+        "dir::../src/MUX.v",
+        "dir::../src/FFD.v",
+        "dir::../src/ANDGATE.v",
+        "dir::../src/modFull.v",
+        "dir::../src/FIFO.v"
+    ],
+    "PDK": "sky130A",
+    "DIE_AREA": [0, 0, 95, 95],
+    "CORE_AREA": [10, 10, 90, 90],
+    "CLOCK_PERIOD": 10.0,
+    "CLOCK_PORT": "clk",
+    "FP_SIZING": "absolute",
+    "PL_TARGET_DENSITY_PCT": 75,
+    "DESIGN_IS_CORE": true,
+    "RUN_KLAYOUT_DRC": true,
+    "RUN_KLAYOUT_LVS": true,
+    "RUN_MAGIC_DRC": true,
+    "VDD_NETS": ["vdd"],
+    "GND_NETS": ["vss"]   
+}
