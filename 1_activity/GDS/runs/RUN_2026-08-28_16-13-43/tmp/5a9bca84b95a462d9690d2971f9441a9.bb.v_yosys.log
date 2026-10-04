@@ -1,0 +1,121 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Running command `
+                    verilog_defines -DUSE_POWER_PINS;
+read_verilog -sv -lib /foss/designs/Work_Area/GDS/runs/RUN_2026-08-28_16-13-43/tmp/5a9bca84b95a462d9690d2971f9441a9.bb.v;
+
+                    blackbox;
+                    write_verilog -noattr -noexpr -nohex -nodec -defparam -blackboxes /foss/designs/Work_Area/GDS/runs/RUN_2026-08-28_16-13-43/tmp/5a9bca84b95a462d9690d2971f9441a9.bb.v;
+                    ' --
+
+1. Executing Verilog-2005 frontend: /foss/designs/Work_Area/GDS/runs/RUN_2026-08-28_16-13-43/tmp/5a9bca84b95a462d9690d2971f9441a9.bb.v
+Parsing SystemVerilog input from `/foss/designs/Work_Area/GDS/runs/RUN_2026-08-28_16-13-43/tmp/5a9bca84b95a462d9690d2971f9441a9.bb.v' to AST representation.
+Generating RTLIL representation for module `\sky130_fd_io__top_gpio_ovtv2'.
+Generating RTLIL representation for module `\sky130_fd_io__top_gpiov2'.
+Generating RTLIL representation for module `\sky130_fd_io__top_ground_hvc_wpad'.
+Generating RTLIL representation for module `\sky130_fd_io__top_ground_lvc_wpad'.
+Generating RTLIL representation for module `\sky130_fd_io__top_power_hvc_wpad'.
+Generating RTLIL representation for module `\sky130_fd_io__top_power_hvc_wpadv2'.
+Generating RTLIL representation for module `\sky130_fd_io__top_power_lvc_wpad'.
+Generating RTLIL representation for module `\sky130_fd_io__top_refgen'.
+Generating RTLIL representation for module `\sky130_fd_io__top_refgen_new'.
+Generating RTLIL representation for module `\sky130_fd_io__top_sio'.
+Generating RTLIL representation for module `\sky130_fd_io__top_sio_macro'.
+Generating RTLIL representation for module `\sky130_fd_io__top_xres4v2'.
+Generating RTLIL representation for module `\sky130_ef_io__connect_vcchib_vccd_and_vswitch_vddio_slice_20um'.
+Generating RTLIL representation for module `\sky130_ef_io__connect_vdda_vddio_and_vssa_vssio_slice_20um'.
+Generating RTLIL representation for module `\sky130_ef_io__vccd_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vccd_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vdda_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vdda_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vddio_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vddio_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssd_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssd_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssio_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssio_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssa_lvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssa_hvc_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__corner_pad'.
+Generating RTLIL representation for module `\sky130_fd_io__com_bus_slice'.
+Generating RTLIL representation for module `\sky130_ef_io__com_bus_slice_1um'.
+Generating RTLIL representation for module `\sky130_ef_io__com_bus_slice_5um'.
+Generating RTLIL representation for module `\sky130_ef_io__com_bus_slice_10um'.
+Generating RTLIL representation for module `\sky130_ef_io__com_bus_slice_20um'.
+Generating RTLIL representation for module `\sky130_ef_io__gpiov2_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vddio_hvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssio_hvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vdda_hvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssa_hvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vccd_lvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssd_lvc_clamped_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vccd_lvc_clamped2_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssd_lvc_clamped2_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vccd_lvc_clamped3_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__vssd_lvc_clamped3_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__top_power_hvc'.
+Generating RTLIL representation for module `\sky130_ef_io__analog_esd_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__analog_noesd_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__analog_pad'.
+Generating RTLIL representation for module `\sky130_ef_io__gpiov2_pad_wrapped'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog backend.
+Dumping module `\sky130_ef_io__analog_esd_pad'.
+Dumping module `\sky130_ef_io__analog_noesd_pad'.
+Dumping module `\sky130_ef_io__analog_pad'.
+Dumping module `\sky130_ef_io__com_bus_slice_10um'.
+Dumping module `\sky130_ef_io__com_bus_slice_1um'.
+Dumping module `\sky130_ef_io__com_bus_slice_20um'.
+Dumping module `\sky130_ef_io__com_bus_slice_5um'.
+Dumping module `\sky130_ef_io__connect_vcchib_vccd_and_vswitch_vddio_slice_20um'.
+Dumping module `\sky130_ef_io__connect_vdda_vddio_and_vssa_vssio_slice_20um'.
+Dumping module `\sky130_ef_io__corner_pad'.
+Dumping module `\sky130_ef_io__gpiov2_pad'.
+Dumping module `\sky130_ef_io__gpiov2_pad_wrapped'.
+Dumping module `\sky130_ef_io__top_power_hvc'.
+Dumping module `\sky130_ef_io__vccd_hvc_pad'.
+Dumping module `\sky130_ef_io__vccd_lvc_clamped2_pad'.
+Dumping module `\sky130_ef_io__vccd_lvc_clamped3_pad'.
+Dumping module `\sky130_ef_io__vccd_lvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vccd_lvc_pad'.
+Dumping module `\sky130_ef_io__vdda_hvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vdda_hvc_pad'.
+Dumping module `\sky130_ef_io__vdda_lvc_pad'.
+Dumping module `\sky130_ef_io__vddio_hvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vddio_hvc_pad'.
+Dumping module `\sky130_ef_io__vddio_lvc_pad'.
+Dumping module `\sky130_ef_io__vssa_hvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vssa_hvc_pad'.
+Dumping module `\sky130_ef_io__vssa_lvc_pad'.
+Dumping module `\sky130_ef_io__vssd_hvc_pad'.
+Dumping module `\sky130_ef_io__vssd_lvc_clamped2_pad'.
+Dumping module `\sky130_ef_io__vssd_lvc_clamped3_pad'.
+Dumping module `\sky130_ef_io__vssd_lvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vssd_lvc_pad'.
+Dumping module `\sky130_ef_io__vssio_hvc_clamped_pad'.
+Dumping module `\sky130_ef_io__vssio_hvc_pad'.
+Dumping module `\sky130_ef_io__vssio_lvc_pad'.
+Dumping module `\sky130_fd_io__com_bus_slice'.
+Dumping module `\sky130_fd_io__top_gpio_ovtv2'.
+Dumping module `\sky130_fd_io__top_gpiov2'.
+Dumping module `\sky130_fd_io__top_ground_hvc_wpad'.
+Dumping module `\sky130_fd_io__top_ground_lvc_wpad'.
+Dumping module `\sky130_fd_io__top_power_hvc_wpad'.
+Dumping module `\sky130_fd_io__top_power_hvc_wpadv2'.
+Dumping module `\sky130_fd_io__top_power_lvc_wpad'.
+Dumping module `\sky130_fd_io__top_refgen'.
+Dumping module `\sky130_fd_io__top_refgen_new'.
+Dumping module `\sky130_fd_io__top_sio'.
+Dumping module `\sky130_fd_io__top_sio_macro'.
+Dumping module `\sky130_fd_io__top_xres4v2'.
+
+End of script. Logfile hash: fca2e5caad, time: 0.04s, user: 0.04s, system: 0.01s, MEM: 58.25 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 92% 2x read_verilog (0 sec), 5% 2x write_verilog (0 sec), ...
