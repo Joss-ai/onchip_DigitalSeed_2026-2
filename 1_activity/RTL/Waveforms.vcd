@@ -1,0 +1,153 @@
+$date
+	Mon Aug 24 22:38:30 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	10ps
+$end
+$scope module Encoder_tb $end
+$var wire 1 ! eoc_tb $end
+$var wire 3 " Dout_tb [2:0] $end
+$var reg 7 # Comp_tb [6:0] $end
+$var reg 1 $ Samp_tb $end
+$var reg 1 % clk_tb $end
+$scope module uut $end
+$var wire 7 & Comp [6:0] $end
+$var wire 1 $ Samp $end
+$var wire 1 % clk $end
+$var wire 1 ' vdd $end
+$var wire 1 ( vss $end
+$var reg 3 ) Bx [2:0] $end
+$var reg 3 * Dout [2:0] $end
+$var reg 1 ! eoc $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx *
+bx )
+z(
+z'
+bx &
+0%
+x$
+bx #
+bx "
+x!
+$end
+#500
+1%
+#1000
+b0 )
+0%
+b0 #
+b0 &
+0$
+#1500
+1!
+b0 "
+b0 *
+1%
+#2000
+b1 )
+0%
+b1 #
+b1 &
+#2500
+b1 "
+b1 *
+1%
+#3000
+b10 )
+0%
+b11 #
+b11 &
+#3500
+b10 "
+b10 *
+1%
+#4000
+b11 )
+0%
+b111 #
+b111 &
+#4500
+b11 "
+b11 *
+1%
+#5000
+b100 )
+0%
+b1111 #
+b1111 &
+#5500
+b100 "
+b100 *
+1%
+#6000
+b101 )
+0%
+b11111 #
+b11111 &
+#6500
+b101 "
+b101 *
+1%
+#7000
+b110 )
+0%
+b111111 #
+b111111 &
+#7500
+b110 "
+b110 *
+1%
+#8000
+b111 )
+0%
+b1111111 #
+b1111111 &
+#8500
+b111 "
+b111 *
+1%
+#9000
+b0 )
+0%
+b1111101 #
+b1111101 &
+#9500
+b0 "
+b0 *
+1%
+#10000
+0%
+b1110001 #
+b1110001 &
+#10500
+1%
+#11000
+b10 )
+0%
+b11 #
+b11 &
+1$
+#11500
+0!
+1%
+#12000
+0%
+0$
+#12500
+1!
+b10 "
+b10 *
+1%
+#13000
+0%
