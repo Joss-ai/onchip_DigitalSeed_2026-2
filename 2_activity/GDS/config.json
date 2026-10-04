@@ -1,0 +1,23 @@
+{
+    "PDK": "sky130A",
+    "DESIGN_NAME": "FIFO",
+    "VERILOG_FILES": "dir::../RTL/FIFO.v",
+    "DESIGN_IS_CORE": true,
+    
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 8.5,
+    
+    "FP_SIZING": "absolute",
+    "DIE_AREA": [0, 0, 120, 120],
+    "CORE_AREA": [10, 10, 100, 100],
+    
+    "PL_TARGET_DENSITY_PCT": 75,
+    "FP_CORE_UTIL": 50,
+    
+    "RUN_KLAYOUT_DRC": true,
+    "RUN_KLAYOUT_LVS": true,
+    "RUN_MAGIC_DRC": true,
+    
+    "VDD_NETS": ["vdd"],
+    "GND_NETS": ["vss"]
+}
