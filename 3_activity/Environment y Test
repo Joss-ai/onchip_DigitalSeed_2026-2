@@ -1,0 +1,7 @@
+# Environment y Test
+
+Reporte de las clases `environment` y `test` del testbench del FIFO.
+
+## 1. Antes de escribir el código: qué conectan estas dos clases:
+
+Antes de leer el código nos será de utilidad tener claro qué hace cada clase **y qué no hace**.
