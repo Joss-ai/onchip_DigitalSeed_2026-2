@@ -14,4 +14,5 @@ Es decir que ninguna de las dos "hace" la verificación. El trabajo principal es
 de comunicación entre ellos.
 
 ### Diagrama de conexiones
- 
+
+<img src="figs/environment_test.jpeg" alt="Diagrama de conexiones del testbench" width="600">
