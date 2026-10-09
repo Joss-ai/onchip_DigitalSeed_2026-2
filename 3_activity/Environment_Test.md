@@ -1,4 +1,4 @@
-# Environment y Test
+# Environment + Test
 
 Reporte de las clases `environment` y `test` del testbench del FIFO.
 
@@ -12,3 +12,6 @@ Solo hace dos cosas: construir los cuatro componentes (`generator`, `driver`, `M
 
 Es decir que ninguna de las dos "hace" la verificación. El trabajo principal es dejar todo cableado para que los otros cuatro componentes puedan tener un canal
 de comunicación entre ellos.
+
+### Diagrama de conexiones
+ 
