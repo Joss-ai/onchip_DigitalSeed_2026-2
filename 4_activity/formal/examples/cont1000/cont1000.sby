@@ -1,0 +1,19 @@
+[tasks]
+bmc
+prove
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+prove: mode prove
+prove: depth 4
+
+[engines]
+smtbmc
+
+[script]
+read -formal cont1000.sv
+prep -top mod1000
+
+[files]
+cont1000.sv

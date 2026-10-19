@@ -1,0 +1,13 @@
+[options]
+mode bmc
+depth 1
+
+[engines]
+smtbmc
+
+[script]
+read -formal abs.sv
+prep -top abs8
+
+[files]
+abs.sv
