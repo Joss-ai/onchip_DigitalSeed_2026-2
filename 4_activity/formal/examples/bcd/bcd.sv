@@ -17,7 +17,7 @@ module bcd_inc (
 
     assert (y <= 9);               // la salida también es BCD válido
     assert (carry == (d == 9));    // hay acarreo exactamente al pasar de 9 a 0
-    always @* cover (carry);       // ¿existe alguna entrada válida que produzca acarreo?
+    cover (carry);       // ¿existe alguna entrada válida que produzca acarreo?
   end
 `endif
 endmodule
