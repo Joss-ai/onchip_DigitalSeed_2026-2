@@ -1,0 +1,13 @@
+[options]
+mode bmc
+depth 5
+
+[engines]
+smtbmc
+
+[script]
+read -formal flag.sv
+prep -top sticky_flag
+
+[files]
+flag.sv
