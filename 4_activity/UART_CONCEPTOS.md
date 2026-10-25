@@ -44,7 +44,10 @@ La CPU lo controla **leyendo y escribiendo registros** a través de un bus de pe
 
 ## 3. Diagrama de conexión de los bloques
 
-> El diagrama a continuación fue tomado de la guía de TI.
+> El diagrama a continuación fue tomado de la guía de **Texas Instruments**.
+
+
+<img src="UART_TI_coloreado.png" alt="Diagrama de conexiones por bloques" width="800">
 
 ---
 
