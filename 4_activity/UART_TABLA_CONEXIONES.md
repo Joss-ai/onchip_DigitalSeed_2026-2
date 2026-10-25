@@ -285,7 +285,4 @@ Supón que llega por `RXD` el mismo byte.
 La división es esta: **yo configuro y aviso, el Baud Generator marca el ritmo, y el transmisor y el receptor hacen el trabajo serial.**
  
 ---
-La división es esta: **yo configuro y aviso, el Baud Generator marca el ritmo, y el transmisor y el receptor hacen el trabajo serial.**
- 
----
- 
+
