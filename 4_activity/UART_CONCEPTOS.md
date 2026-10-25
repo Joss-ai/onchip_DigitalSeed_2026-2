@@ -136,3 +136,38 @@ Según el docx, ambos quedan dentro de la Control Logic.
 
 
 ---
+
+
+## 5. Para qué sirve mi Control Logic
+ 
+> **Aviso:** En la Figura 1-1 de TI existe una cajita llamada "Control Logic" junto al MCR.
+> **No es el bloque especificado en el docx.** El "Control Logic" que se trabajará en el código es la definición del docx: decodificación + registros +
+> *Select* + *Data Bus Buffer*.
+ 
+### 5.1 Tres tipos de conexión con los demás bloques
+ 
+| Tipo | Dirección | Ejemplos |
+|---|---|---|
+| **Configuración** | Control Logic → otros | Formato de trama (bits de datos, paridad, stop), divisor de baudios, activar FIFOs, reset de transmisor/receptor, habilitar interrupciones |
+| **Pulsos de acceso** | Control Logic → otros | "La CPU acaba de escribir un byte para enviar", "la CPU acaba de leer el dato recibido", "la CPU leyó el estado", "la CPU escribió el control de FIFO" |
+| **Estado** | otros → Control Logic | Si hay dato listo, errores de recepción, si el transmisor está vacío, valor del IIR, byte recibido |
+ 
+### 5.2 Lo que hace, en orden
+ 
+1. **Decodifica** la dirección que pone la CPU y decide a qué registro se accede.
+   Algunas direcciones se comparten: una misma dirección puede ser RBR, THR o DLL según el bit **DLAB**, y otra puede ser IIR (lectura) o FCR (escritura).
+2. **Guarda** los registros de configuración: se escriben desde el bus y mantienen su valor.
+3. **Reparte** esa configuración como señales hacia transmisor, receptor, FIFOs, generador de baudios e interrupciones.
+4. **Avisa** con pulsos de un ciclo cuándo hubo un acceso relevante, para que los FIFOs saquen/metan un byte y las interrupciones limpien banderas.
+5. **Compone la lectura:** arma el registro de estado (LSR) con bits que vienen de otros bloques y elige qué valor sale por el bus.
+6. **Hace esperar a la CPU** (2 estados de espera) cuando escribe el divisor de baudios.
+
+### 5.3 Lo que NO hace
+
+- No convierte bits entre serial y paralelo.
+- No detecta START ni cuenta tiempos de bit.
+- No calcula ni revisa paridad.
+- No decide cuándo interrumpir ni con qué prioridad.
+- No guarda los bytes de datos (eso es de los FIFOs).
+
+---
