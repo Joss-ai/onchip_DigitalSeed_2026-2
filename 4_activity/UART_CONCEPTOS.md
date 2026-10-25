@@ -51,6 +51,27 @@ La CPU lo controla **leyendo y escribiendo registros** a través de un bus de pe
 
 ---
 
+### 3.1 Diferencias entre el diagrama de TI y el reparto del docx
+ 
+| Tema | Figura 1-1 de TI | `UART_Signals.docx` |
+|---|---|---|
+| **Nombre "Control Logic"** | Es **una caja pequeña**: recibe la salida del MCR y se conecta con los bloques de timing y control y con el registro de energía/emulación. La guía no la describe en el texto. | Es **un bloque grande**: decodificación, registros, *Select* y *Data Bus Buffer*. **No es la misma caja**, solo comparte el nombre. |
+| Registros (LCR, MCR, IER, FCR, DLL/DLH, etc.) | Cada uno es una caja suelta conectada al bus | Todos quedan **dentro** del Control Logic |
+| Data Bus Buffer y los dos *Select* | Cajas sueltas | **Dentro** del bloque Control Logic |
+| Funciones de la caja Control Logic de TI (loopback, autoflow con RTS/CTS) | Se ven conectadas al MCR y a los bloques de timing | En el docx están **repartidas** en el TX y el RX (señales `loop`, `afe`, `rts_n`, `cts_n`) |
+| **Baud Generator** | Caja propia | **No aparece como bloque** en el docx: solo se menciona el `bclk_tick` y el `divisor` sale del bloque control logic. |
+| Receiver FIFO y Transmitter FIFO | Cajas propias | Bloques propios (1 y 2) |
+| Timing and Control + Shift Register | Cajas separadas | Cada timing and control **incluye** su registro de desplazamiento |
+| Interrupt/Event Control + IIR | Caja de control + registro IIR | El bloque 6 genera el valor del IIR, y el Control Logic solo lo recibe y lo presenta en el bus |
+| Eventos desde los bloques hacia Interrupt/Event Control | No se dibujan líneas | El docx sí define esas entradas (errores de línea, FIFO vacío, nivel de disparo…) |
+ 
+> **Resumen:** el diagrama de arriba mantiene la estructura de TI, y el recuadro muestra qué parte
+> del dibujo corresponde a **el** Control Logic según el UART_Signals.docx.
+ 
+---
+
+
+
 
 
 
