@@ -286,3 +286,31 @@ La división es esta: **yo configuro y aviso, el Baud Generator marca el ritmo, 
  
 ---
 
+## 6. Cómo queda la interconexión completa
+ 
+### 6.1 Qué recibe cada bloque de mí
+ 
+| Bloque | Señales que le doy |
+|---|---|
+| Receiver FIFO | `rbr_rd` (pop), `fifo_en`, `rxclr` (clr), `rxfiftl` |
+| Transmitter FIFO | `thr_wr` (push), `fifo_en`, `txclr` (clr) |
+| Receiver T&C | `wls`, `pen`, `eps`, `sp`, `osm_sel`, `urrst`, `afe`, `rts_en` |
+| Transmitter T&C | `wls`, `pen`, `eps`, `sp`, `stb`, `bc`, `osm_sel`, `utrst`, `afe`, `loop` |
+| Interrupt / Event | `erbi`, `etbei`, `elsi`, `edssi`, `rbr_rd`, `lsr_rd`, `thr_wr`, `iir_rd`, `wls`, `urrst`, `utrst`, `fifo_en`, `dmamode1` |
+| Baud generator | `divisor` |
+ 
+### 6.2 Qué recibo yo de cada bloque
+ 
+| Bloque | Señales que recibo |
+|---|---|
+| Receiver FIFO | `DR` (de `~empty`), `PE/FE/BI` (de `err_top`), `RXFIFOE` (de `any_err`), `rbr_data` (de `dout`) |
+| Transmitter FIFO | `THRE` (de `empty`), y `empty` para formar `TEMT` |
+| Transmitter T&C | `tsr_empty`, que con `empty` del FIFO TX forma `TEMT` |
+| Receiver T&C | `OE` (de `oe`) |
+| Interrupt / Event | `iir_data` (de `iir`) |
+ 
+### 6.3 Señales que yo genero y nadie consume (según el docx)
+ 
+`fcr_wr`, `dlab`, `out1`, `out2`, `free`. Están en el docx como salidas mías, pero ningún bloque las lista como entrada.
+Se dejan sin conectar en el top. FALTA PREGUNTAR SI TIENE ALGÚN DESTINO.
+ 
