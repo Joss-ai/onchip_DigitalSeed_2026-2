@@ -12,8 +12,6 @@ $$
 
 Where:
 
-Where:
-
 $f_{\max}$: Maximum operating frequency.
 $P_{\max}$: Maximum power consumption.
 $Area$: Physical area occupied by the design.
