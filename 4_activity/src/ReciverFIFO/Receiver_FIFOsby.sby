@@ -1,0 +1,19 @@
+[options]
+mode bmc
+depth 5
+
+[engines]
+smtbmc
+
+[script]
+read -formal Contador.v
+read -formal RAM.v
+read -formal FFD.v
+read -formal Receiver_FIFO.sv
+prep -top Receiver_FIFO
+
+[files]
+RAM.v
+Contador.v
+FFD.v
+Receiver_FIFO.sv

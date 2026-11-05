@@ -7,6 +7,7 @@ module Transmitter_FIFO(
     input push,
     input pop,
     input fifo_en,
+    
     output [7:0] dout,
     output empty,
     output full,
@@ -61,5 +62,57 @@ module Transmitter_FIFO(
 
     // Nivel de ocupación actual (0 a 16)
     assign cout = Pcar - Psal;
+
+// ==========================================
+    // ZONA DE VERIFICACIÓN FORMAL (ASSERTIONS)
+    // ==========================================    
+    `ifdef FORMAL
+
+        // 1. Inicialización obligatoria para evitar estados fantasma en el ciclo 0
+        initial begin
+            assume (rst == 1'b1);
+        end
+
+        // 2. Exclusión mutua: La FIFO jamás debe reportar 'full' y 'empty' al mismo tiempo
+        always_comb begin
+            assert (!(full && empty));
+        end
+        
+        // 3. Límites físicos: El contador de ocupación no puede superar 16
+        always_comb begin
+            assert (cout <= 5'd16);
+        end
+
+        // 4. Verificación de Estado Post-Reset
+        // Mientras el reset esté activo, la FIFO debe vaciarse obligatoriamente
+        always @(posedge clk) begin
+            if (rst) begin
+                assert (empty);
+                assert (!full);
+                assert (cout == 5'd0);
+            end
+        end
+
+        // 5. Retención de la bandera 'FULL'
+        // Si estaba llena, intentamos escribir (safe_wr_en) y no leemos, debe seguir llena
+        always @(posedge clk) begin
+            if (!rst) begin
+                if (full && safe_wr_en && !rd_en) begin
+                    assert (full);
+                end
+            end
+        end
+
+        // 6. Retención de la bandera 'EMPTY'
+        // Si estaba vacía, leemos y no escribimos, debe seguir vacía
+        always @(posedge clk) begin
+            if (!rst) begin
+                if (empty && rd_en && !safe_wr_en) begin
+                    assert (empty);
+                end
+            end
+        end
+
+    `endif
 
 endmodule

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ReciverFIFO(
+module Receiver_FIFO(
     input clk,
     input rst,
     input [7:0] din,    
@@ -79,7 +79,7 @@ module ReciverFIFO(
     assign full  = (Pcar[4] != Psal[4]) && (Pcar[3:0] == Psal[3:0]);
     
     // Nivel de ocupación actual (0 a 16)
-    assign cout = Pcar - Psal;
+    assign cout = $signed({1'b0, Pcar}) - $signed({1'b0, Psal});
     
     // Decodificación del Nivel de Disparo (Trigger Level) según rxfiftl[1:0]
     reg [4:0] trig_limit;
@@ -115,4 +115,50 @@ module ReciverFIFO(
     // any_err se activa si hay al menos un error en el FIFO y no está vacío
     assign any_err = (|slot_has_err) && !empty;
 
+    // ==========================================
+    // ZONA DE VERIFICACIÓN FORMAL (ASSERTIONS)
+    // ==========================================
+    `ifdef FORMAL
+
+        // 1. CONDICIÓN DE INICIALIZACIÓN (Obligatorio para evitar estados fantasma)
+        // Forzamos al motor SMT a que en el primer ciclo (Time 0) el reset esté activo.
+        initial begin
+            assume (rst == 1'b1);
+        end
+
+        // 2. EXCLUSIÓN MUTUA BÁSICA
+        // Una FIFO nunca debe reportar 'full' y 'empty' al mismo tiempo.
+        always_comb begin
+            assert (!(full && empty));
+        end
+
+        // 3. LÍMITES FÍSICOS DEL CONTADOR DE OCUPACIÓN
+        // El contador cout jamás puede superar el tamaño máximo de la FIFO (16).
+        always_comb begin
+            assert (cout <= 5'd16);
+        end
+
+        // 4. RETENCIÓN DEL ESTADO 'FULL'
+        // Si la FIFO ya estaba llena, intentamos escribir (safe_wr_en) y NO leemos (rd_en), 
+        // debe mantenerse llena en el siguiente ciclo.
+        always @(posedge clk) begin
+            if (!rst) begin // Solo evaluamos si el circuito salió del reset
+                if (full && safe_wr_en && !rd_en) begin
+                    assert (full);
+                end
+            end
+        end
+
+        // 5. RETENCIÓN DEL ESTADO 'EMPTY'
+        // Si la FIFO estaba vacía, leemos (rd_en) y NO escribimos (safe_wr_en), 
+        // debe mantenerse vacía en el siguiente ciclo.
+        always @(posedge clk) begin
+            if (!rst) begin // Solo evaluamos si el circuito salió del reset
+                if (empty && rd_en && !safe_wr_en) begin
+                    assert (empty);
+                end
+            end
+        end
+
+    `endif
 endmodule

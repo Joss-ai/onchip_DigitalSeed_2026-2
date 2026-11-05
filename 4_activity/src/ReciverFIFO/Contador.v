@@ -12,7 +12,7 @@ module Contador(
     
     assign in = out + 1'b1;
     
-    FFD2 FF_contador (
+    FFD FF_contador (
         .D(in),
         .Q(out),
         .E(E),
@@ -23,3 +23,4 @@ module Contador(
     assign puntero = out;  
 
 endmodule
+
