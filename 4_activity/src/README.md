@@ -8,7 +8,7 @@ The designs are based on the UART architecture described in the *KeyStone Archit
 
 The project covers two main components: the **Receiver FIFO**, responsible for buffering incoming data and its associated error information, and the **Transmitter FIFO**, responsible for buffering outgoing data before it is transferred to the transmitter shift register.
 
-The initial implementations are described in Verilog and will serve as the starting point for the verification process. The designs will be progressively adapted to SystemVerilog to incorporate formal properties, assertions, and verification mechanisms capable of checking their functional behavior and operating constraints.
+The initial implementations are described in Verilog and have been adapted to SystemVerilog to incorporate formal properties, assertions, and verification mechanisms using open-source tools (`Yosys` and `SymbiYosys`).
 
 ## Receiver FIFO Architecture
 
@@ -74,13 +74,15 @@ Unlike the Receiver FIFO, this architecture does not require additional error in
 ├── ReceiverFIFO/
 │   ├── Contador.v
 │   ├── FFD.v
-│   ├── ReceiverFIFO.v
+│   ├── Receiver_FIFO.sv
+│   ├── Receiver_FIFOsby.sby
 │   └── RAM.v
 │
 ├── TransmitterFIFO/
 │   ├── Contador.v
 │   ├── FFD.v
-│   ├── TransmitterFIFO.v
+│   ├── Transmitter_FIFO.sv
+│   ├── Transmitter_FIFOsby.sby
 │   └── RAM.v
 │
 └── README.md
@@ -94,45 +96,21 @@ Unlike the Receiver FIFO, this architecture does not require additional error in
 
 ## Formal Verification Roadmap
 
-The project follows two main verification stages:
+The project follows two main verification stages using open-source Bounded Model Checking (`smtbmc`) via **SymbiYosys (`sby`)** and **Yosys**:
 
 ### Stage 1: Receiver FIFO Verification
 
-The first stage focuses on reviewing the existing Receiver FIFO architecture, adapting the RTL implementation to SystemVerilog, and developing the formal verification environment.
-
-The verification process will focus on the following properties:
-
-- Correct FIFO data ordering (First-In, First-Out behavior).
-- Data integrity during write and read operations.
-- Correct behavior under simultaneous push and pop operations.
-- Proper handling of full and empty conditions.
-- Correct occupancy counter behavior.
-- Reset and clear functionality.
-- Correct association between received data and its error information.
-- Trigger-level detection and error-status signaling.
+The first stage focused on adapting the Receiver FIFO RTL implementation to SystemVerilog, resolving asynchronous reset and counter synchronization, and validating key operational properties:
+- Correct FIFO data ordering and counter behavior (`cout <= 16`).
+- Mutual exclusion (preventing simultaneous `full` and `empty` states).
+- Clean post-reset initialization and state retention under blocked operations.
 
 ### Stage 2: Transmitter FIFO Verification
 
-The second stage focuses on reviewing and adapting the Transmitter FIFO implementation to SystemVerilog, followed by the development of its formal verification environment.
-
-The verification process will focus on:
-
-- Correct FIFO data ordering.
-- Data integrity during write and read operations.
-- Correct behavior under simultaneous push and pop operations.
-- Proper handling of full and empty conditions.
-- Correct occupancy counter behavior.
-- Reset functionality.
-- Prevention of invalid read and write operations.
+The second stage extended the established verification methodology to the Transmitter FIFO architecture, ensuring robust handling of data buffering, pointer synchronization, and safety properties.
 
 ## Implementation Status
 
-**Status: Under development.**
+**Status: Completed & Verified.**
 
-Both Receiver and Transmitter FIFO RTL implementations are available in Verilog and serve as the starting point for the formal verification activities.
-
-The next step is to review the existing architectures, adapt the designs to SystemVerilog, and define the formal properties required to validate their functional behavior and operating constraints.
-
-The verification process will initially focus on the Receiver FIFO. Once its properties have been implemented and validated, the same methodology will be extended to the Transmitter FIFO.
-
-The final objective is to obtain formally verified FIFO implementations for both the reception and transmission paths of the UART communication system.
+Both the Receiver and Transmitter FIFO RTL implementations have been successfully adapted to SystemVerilog and verified using formal property checking, ensuring reliable operation for both paths of the UART communication system.
