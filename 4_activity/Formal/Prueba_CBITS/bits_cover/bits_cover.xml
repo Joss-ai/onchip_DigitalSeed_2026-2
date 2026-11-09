@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-11-09T22:11:54" hostname="d91659a2365a" package="bits" id="0" name="cover" tests="9" errors="0" failures="0" time="0" skipped="7">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="cover" name="build execution" time="0">
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:40.15-40.56" time="0" type="ASSERT" location="C_BITS.v:40.15-40.56" id="_witness_.check_assert_C_BITS_v_40_36">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:41.33-41.57" time="0" type="ASSERT" location="C_BITS.v:41.33-41.57" id="_witness_.check_assert_C_BITS_v_41_41">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:44.19-44.57" time="0" type="ASSERT" location="C_BITS.v:44.19-44.57" id="_witness_.check_assert_C_BITS_v_44_54">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:45.44-45.57" time="0" type="ASSERT" location="C_BITS.v:45.44-45.57" id="_witness_.check_assert_C_BITS_v_45_57">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:46.55-46.77" time="0" type="ASSERT" location="C_BITS.v:46.55-46.77" id="_witness_.check_assert_C_BITS_v_46_60">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:47.33-47.70" time="0" type="ASSERT" location="C_BITS.v:47.33-47.70" id="_witness_.check_assert_C_BITS_v_47_62">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_BITS at C_BITS.v:48.33-48.63" time="0" type="ASSERT" location="C_BITS.v:48.33-48.63" id="_witness_.check_assert_C_BITS_v_48_65">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property COVER in C_BITS at C_BITS.v:52.9-52.60" time="0" type="COVER" location="C_BITS.v:52.9-52.60" id="_witness_.check_cover_C_BITS_v_52_68" tracefile="engine_0/trace0.vcd">
+</testcase>
+<testcase classname="cover" name="Property COVER in C_BITS at C_BITS.v:53.9-53.60" time="0" type="COVER" location="C_BITS.v:53.9-53.60" id="_witness_.check_cover_C_BITS_v_53_74" tracefile="engine_0/trace1.vcd">
+</testcase>
+<system-out>SBY 22:11:53 [bits_bmc] Removing directory '/foss/designs/Digital/UART/Prueba_CBITS/bits_bmc'.
+SBY 22:11:53 [bits_prove] Removing directory '/foss/designs/Digital/UART/Prueba_CBITS/bits_prove'.
+SBY 22:11:53 [bits_cover] Removing directory '/foss/designs/Digital/UART/Prueba_CBITS/bits_cover'.
+SBY 22:11:53 [bits_cover] Copy '/foss/designs/Digital/UART/Prueba_CBITS/C_BITS.v' to '/foss/designs/Digital/UART/Prueba_CBITS/bits_cover/src/C_BITS.v'.
+SBY 22:11:53 [bits_cover] engine_0: smtbmc
+SBY 22:11:53 [bits_cover] base: starting process &quot;cd bits_cover/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 22:11:53 [bits_cover] base: finished (returncode=0)
+SBY 22:11:53 [bits_cover] prep: starting process &quot;cd bits_cover/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 22:11:53 [bits_cover] prep: finished (returncode=0)
+SBY 22:11:53 [bits_cover] smt2: starting process &quot;cd bits_cover/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 22:11:53 [bits_cover] smt2: finished (returncode=0)
+SBY 22:11:53 [bits_cover] engine_0: starting process &quot;cd bits_cover; yosys-smtbmc --presat --unroll -c --noprogress -t 25  --append 0 --dump-vcd engine_0/trace%.vcd --dump-yw engine_0/trace%.yw --dump-vlogtb engine_0/trace%_tb.v --dump-smtc engine_0/trace%.smtc model/design_smt2.smt2&quot;
+SBY 22:11:53 [bits_cover] engine_0: ##   0:00:00  Solver: yices
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Checking cover reachability in step 0..
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Checking cover reachability in step 1..
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_BITS: C_BITS.v:52.9-52.60 (_witness_.check_cover_C_BITS_v_52_68)
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace0.vcd
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace0_tb.v
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace0.smtc
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace0.yw
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_BITS: C_BITS.v:53.9-53.60 (_witness_.check_cover_C_BITS_v_53_74)
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace1.vcd
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace1_tb.v
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace1.smtc
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace1.yw
+SBY 22:11:54 [bits_cover] engine_0: ##   0:00:00  Status: passed
+SBY 22:11:54 [bits_cover] engine_0: finished (returncode=0)
+SBY 22:11:54 [bits_cover] engine_0: Status returned by engine: pass
+SBY 22:11:54 [bits_cover] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:11:54 [bits_cover] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:11:54 [bits_cover] summary: engine_0 (smtbmc) returned pass
+SBY 22:11:54 [bits_cover] summary: cover trace: bits_cover/engine_0/trace0.vcd
+SBY 22:11:54 [bits_cover] summary:   reached cover statement C_BITS._witness_.check_cover_C_BITS_v_52_68 at C_BITS.v:52.9-52.60 step 2
+SBY 22:11:54 [bits_cover] summary: cover trace: bits_cover/engine_0/trace1.vcd
+SBY 22:11:54 [bits_cover] summary:   reached cover statement C_BITS._witness_.check_cover_C_BITS_v_53_74 at C_BITS.v:53.9-53.60 step 2
+SBY 22:11:54 [bits_cover] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

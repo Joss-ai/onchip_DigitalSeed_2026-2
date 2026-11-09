@@ -1,0 +1,65 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Executing script file `design_smt2.ys' --
+
+1. Executing RTLIL frontend.
+Input filename: design_prep.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `C_BITS'. Setting top module to C_BITS.
+
+2.1. Analyzing design hierarchy..
+Top module:  \C_BITS
+
+2.2. Analyzing design hierarchy..
+Top module:  \C_BITS
+Removed 0 unused modules.
+Module C_BITS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+3. Executing FORMALFF pass.
+
+4. Executing DFFUNMAP pass (unmap clock enable and synchronous reset from FFs).
+
+5. Printing statistics.
+
+=== C_BITS ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       72 wires
+      113 wire bits
+       22 public wires
+       48 public wire bits
+        8 ports
+        9 port bits
+       76 cells
+        4   $add
+       13   $anyinit
+        7   $assert
+        4   $assume
+        7   $eq
+       12   $ff
+        1   $ge
+        2   $le
+        2   $logic_and
+        2   $logic_not
+        4   $logic_or
+       17   $mux
+        1   $not
+
+6. Executing SMT2 backend.
+
+6.1. Executing BMUXMAP pass.
+
+6.2. Executing DEMUXMAP pass.
+Creating SMT-LIBv2 representation of module C_BITS.
+
+End of script. Logfile hash: 37e4347cc6, time: 0.02s, user: 0.01s, system: 0.01s, MEM: 33.72 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 41% 2x write_smt2 (0 sec), 35% 2x read_rtlil (0 sec), ...

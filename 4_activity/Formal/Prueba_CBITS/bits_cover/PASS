@@ -1,0 +1,9 @@
+Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+engine_0 (smtbmc) returned pass
+cover trace: engine_0/trace0.vcd
+cover trace: engine_0/trace0.yw
+  reached cover statement C_BITS._witness_.check_cover_C_BITS_v_52_68 at C_BITS.v:52.9-52.60 step 2
+cover trace: engine_0/trace1.vcd
+cover trace: engine_0/trace1.yw
+  reached cover statement C_BITS._witness_.check_cover_C_BITS_v_53_74 at C_BITS.v:53.9-53.60 step 2

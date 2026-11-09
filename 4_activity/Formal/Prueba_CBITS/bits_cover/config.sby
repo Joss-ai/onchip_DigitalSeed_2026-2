@@ -1,0 +1,13 @@
+[options]
+mode cover
+depth 25
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv C_BITS.v
+prep -top C_BITS
+
+[files]
+C_BITS.v

@@ -1,0 +1,299 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Executing script file `../model/design.ys' --
+
+1. Executing Verilog-2005 frontend: C_BITS.v
+Parsing formal SystemVerilog input from `C_BITS.v' to AST representation.
+Storing AST representation for module `$abstract\C_BITS'.
+Successfully finished Verilog frontend.
+
+2. Executing PREP pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.2. Executing AST frontend in derive mode using pre-parsed AST for module `\C_BITS'.
+Generating RTLIL representation for module `\C_BITS'.
+
+2.2.1. Analyzing design hierarchy..
+Top module:  \C_BITS
+
+2.2.2. Analyzing design hierarchy..
+Top module:  \C_BITS
+Removing unused module `$abstract\C_BITS'.
+Removed 1 unused modules.
+Module C_BITS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+2.3. Executing PROC pass (convert processes to netlists).
+
+2.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$C_BITS.v:43$43 in module C_BITS.
+Marked 2 switch rules as full_case in process $proc$C_BITS.v:17$15 in module C_BITS.
+Removed a total of 0 dead cases.
+
+2.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 4 redundant assignments.
+Promoted 17 assignments to connections.
+
+2.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\C_BITS.$proc$C_BITS.v:30$79'.
+  Set init value: \f_past_valid = 1'0
+
+2.3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~12 debug messages>
+
+2.3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:30$79'.
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:51$67'.
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:43$43'.
+     1/5: $assert$C_BITS.v:48$65_EN
+     2/5: $assert$C_BITS.v:47$62_EN
+     3/5: $assert$C_BITS.v:46$60_EN
+     4/5: $assert$C_BITS.v:45$57_EN
+     5/5: $assert$C_BITS.v:44$54_EN
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:41$40'.
+     1/1: $assert$C_BITS.v:41$41_EN
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:40$35'.
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:38$31'.
+     1/1: $assume$C_BITS.v:38$33_EN
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:35$24'.
+     1/1: $assume$C_BITS.v:35$27_EN
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:32$21'.
+     1/1: $assume$C_BITS.v:32$23_EN
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:31$20'.
+Creating decoders for process `\C_BITS.$proc$C_BITS.v:17$15'.
+     1/2: $0\Done[0:0]
+     2/2: $0\count[3:0]
+
+2.3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\C_BITS.$past$C_BITS.v:44$3$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$125' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:44$4$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$126' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:45$5$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$127' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:45$6$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$128' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:46$7$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$129' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:46$8$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$130' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:46$9$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$131' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:47$10$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$132' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:47$11$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$133' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:48$12$0' using process `\C_BITS.$proc$C_BITS.v:43$43'.
+  created $dff cell `$procdff$134' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:35$1$0' using process `\C_BITS.$proc$C_BITS.v:35$24'.
+  created $dff cell `$procdff$135' with positive edge clock.
+Creating register for signal `\C_BITS.$past$C_BITS.v:35$2$0' using process `\C_BITS.$proc$C_BITS.v:35$24'.
+  created $dff cell `$procdff$136' with positive edge clock.
+Creating register for signal `\C_BITS.\f_past_valid' using process `\C_BITS.$proc$C_BITS.v:31$20'.
+  created $dff cell `$procdff$137' with positive edge clock.
+Creating register for signal `\C_BITS.\Done' using process `\C_BITS.$proc$C_BITS.v:17$15'.
+  created $dff cell `$procdff$138' with positive edge clock.
+Creating register for signal `\C_BITS.\count' using process `\C_BITS.$proc$C_BITS.v:17$15'.
+  created $dff cell `$procdff$139' with positive edge clock.
+
+2.3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `C_BITS.$proc$C_BITS.v:30$79'.
+Removing empty process `C_BITS.$proc$C_BITS.v:51$67'.
+Found and cleaned up 5 empty switches in `\C_BITS.$proc$C_BITS.v:43$43'.
+Removing empty process `C_BITS.$proc$C_BITS.v:43$43'.
+Found and cleaned up 1 empty switch in `\C_BITS.$proc$C_BITS.v:41$40'.
+Removing empty process `C_BITS.$proc$C_BITS.v:41$40'.
+Removing empty process `C_BITS.$proc$C_BITS.v:40$35'.
+Found and cleaned up 1 empty switch in `\C_BITS.$proc$C_BITS.v:38$31'.
+Removing empty process `C_BITS.$proc$C_BITS.v:38$31'.
+Found and cleaned up 1 empty switch in `\C_BITS.$proc$C_BITS.v:35$24'.
+Removing empty process `C_BITS.$proc$C_BITS.v:35$24'.
+Found and cleaned up 1 empty switch in `\C_BITS.$proc$C_BITS.v:32$21'.
+Removing empty process `C_BITS.$proc$C_BITS.v:32$21'.
+Removing empty process `C_BITS.$proc$C_BITS.v:31$20'.
+Found and cleaned up 3 empty switches in `\C_BITS.$proc$C_BITS.v:17$15'.
+Removing empty process `C_BITS.$proc$C_BITS.v:17$15'.
+Cleaned up 12 empty switches.
+
+2.3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+<suppressed ~3 debug messages>
+
+2.4. Executing FUTURE pass.
+
+2.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+
+2.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_BITS..
+Removed 1 unused cells and 49 unused wires.
+<suppressed ~2 debug messages>
+
+2.7. Executing CHECK pass (checking for obvious problems).
+Checking module C_BITS...
+Found and reported 0 problems.
+
+2.8. Executing OPT pass (performing simple optimizations).
+
+2.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+
+2.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_BITS'.
+Computing hashes of 78 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+Computing hashes of 76 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+2.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \C_BITS..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+2.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \C_BITS.
+Performed a total of 0 changes.
+
+2.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_BITS'.
+Computing hashes of 76 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+Computing hashes of 74 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+2.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_BITS..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+2.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+
+2.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \C_BITS..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~26 debug messages>
+
+2.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \C_BITS.
+Performed a total of 0 changes.
+
+2.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_BITS'.
+Computing hashes of 74 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+Removed a total of 0 cells.
+
+2.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_BITS..
+
+2.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+
+2.8.14. Finished fast OPT passes. (There is nothing left to do.)
+
+2.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 2 bits (of 4) from port A of cell C_BITS.$add$C_BITS.v:14$13 ($add).
+Removed top 1 bits (of 4) from port B of cell C_BITS.$add$C_BITS.v:14$13 ($add).
+Removed top 3 bits (of 4) from port B of cell C_BITS.$add$C_BITS.v:21$18 ($add).
+Removed top 1 bits (of 4) from port B of cell C_BITS.$ge$C_BITS.v:40$37 ($ge).
+Removed top 3 bits (of 4) from port B of cell C_BITS.$add$C_BITS.v:47$63 ($add).
+
+2.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_BITS..
+
+2.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.12. Executing OPT pass (performing simple optimizations).
+
+2.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_BITS.
+
+2.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_BITS'.
+Computing hashes of 74 cells of `\C_BITS'.
+Finding duplicate cells in `\C_BITS'.
+Removed a total of 0 cells.
+
+2.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_BITS..
+
+2.12.4. Finished fast OPT passes.
+
+2.13. Executing SORT pass.
+
+2.14. Printing statistics.
+
+=== C_BITS ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       69 wires
+      110 wire bits
+       11 public wires
+       18 public wire bits
+        8 ports
+        9 port bits
+       74 cells
+        4   $add
+       12   $check
+       15   $dff
+        8   $eq
+        1   $ge
+        2   $le
+        7   $logic_and
+        4   $logic_not
+        4   $logic_or
+       17   $mux
+
+2.15. Executing CHECK pass (checking for obvious problems).
+Checking module C_BITS...
+Found and reported 0 problems.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `C_BITS'. Setting top module to C_BITS.
+
+3.1. Analyzing design hierarchy..
+Top module:  \C_BITS
+
+3.2. Analyzing design hierarchy..
+Top module:  \C_BITS
+Removed 0 unused modules.
+Module C_BITS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+4. Executing jny backend.
+
+5. Executing RTLIL backend.
+Output filename: ../model/design.il
+
+End of script. Logfile hash: d52df508a3, time: 0.05s, user: 0.05s, system: 0.03s, MEM: 36.51 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 18% 2x hierarchy (0 sec), 15% 5x opt_clean (0 sec), ...
