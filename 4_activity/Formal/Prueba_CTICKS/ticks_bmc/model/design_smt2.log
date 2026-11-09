@@ -1,0 +1,64 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Executing script file `design_smt2.ys' --
+
+1. Executing RTLIL frontend.
+Input filename: design_prep.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `C_TICKS'. Setting top module to C_TICKS.
+
+2.1. Analyzing design hierarchy..
+Top module:  \C_TICKS
+
+2.2. Analyzing design hierarchy..
+Top module:  \C_TICKS
+Removed 0 unused modules.
+Module C_TICKS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+3. Executing FORMALFF pass.
+
+4. Executing DFFUNMAP pass (unmap clock enable and synchronous reset from FFs).
+
+5. Printing statistics.
+
+=== C_TICKS ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       76 wires
+      102 wire bits
+       23 public wires
+       37 public wire bits
+        8 ports
+       11 port bits
+       81 cells
+        1   $add
+       14   $anyinit
+        8   $assert
+        3   $assume
+        6   $eq
+       13   $ff
+        2   $le
+        1   $logic_and
+        2   $logic_not
+        6   $logic_or
+       24   $mux
+        1   $not
+
+6. Executing SMT2 backend.
+
+6.1. Executing BMUXMAP pass.
+
+6.2. Executing DEMUXMAP pass.
+Creating SMT-LIBv2 representation of module C_TICKS.
+
+End of script. Logfile hash: d2c1e2e7b9, time: 0.04s, user: 0.03s, system: 0.02s, MEM: 33.84 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 57% 2x write_smt2 (0 sec), 25% 2x read_rtlil (0 sec), ...

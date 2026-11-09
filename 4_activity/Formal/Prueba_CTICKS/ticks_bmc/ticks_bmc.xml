@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-11-09T22:24:24" hostname="d91659a2365a" package="ticks" id="0" name="bmc" tests="12" errors="0" failures="0" time="1" skipped="4">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="bmc" name="build execution" time="0">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:44.22-44.48" time="0" type="ASSERT" location="C_TICKS.v:44.22-44.48" id="_witness_.check_assert_C_TICKS_v_44_33">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:45.22-45.48" time="0" type="ASSERT" location="C_TICKS.v:45.22-45.48" id="_witness_.check_assert_C_TICKS_v_45_35">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:50.9-50.34" time="0" type="ASSERT" location="C_TICKS.v:50.9-50.34" id="_witness_.check_assert_C_TICKS_v_50_46">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:51.9-51.61" time="0" type="ASSERT" location="C_TICKS.v:51.9-51.61" id="_witness_.check_assert_C_TICKS_v_51_47">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:52.29-52.61" time="0" type="ASSERT" location="C_TICKS.v:52.29-52.61" id="_witness_.check_assert_C_TICKS_v_52_51">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:53.29-53.61" time="0" type="ASSERT" location="C_TICKS.v:53.29-53.61" id="_witness_.check_assert_C_TICKS_v_53_53">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:59.13-59.38" time="0" type="ASSERT" location="C_TICKS.v:59.13-59.38" id="_witness_.check_assert_C_TICKS_v_59_63">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in C_TICKS at C_TICKS.v:61.13-61.49" time="0" type="ASSERT" location="C_TICKS.v:61.13-61.49" id="_witness_.check_assert_C_TICKS_v_61_66">
+</testcase>
+<testcase classname="bmc" name="Property COVER in C_TICKS at C_TICKS.v:65.9-65.51" time="0" type="COVER" location="C_TICKS.v:65.9-65.51" id="_witness_.check_cover_C_TICKS_v_65_71">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in C_TICKS at C_TICKS.v:66.9-66.51" time="0" type="COVER" location="C_TICKS.v:66.9-66.51" id="_witness_.check_cover_C_TICKS_v_66_75">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in C_TICKS at C_TICKS.v:67.9-67.89" time="0" type="COVER" location="C_TICKS.v:67.9-67.89" id="_witness_.check_cover_C_TICKS_v_67_78">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in C_TICKS at C_TICKS.v:68.9-68.89" time="0" type="COVER" location="C_TICKS.v:68.9-68.89" id="_witness_.check_cover_C_TICKS_v_68_85">
+<skipped />
+</testcase>
+<system-out>SBY 22:24:23 [ticks_bmc] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_bmc'.
+SBY 22:24:23 [ticks_bmc] Copy '/foss/designs/Digital/UART/Prueba_CTICKS/C_TICKS.v' to '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_bmc/src/C_TICKS.v'.
+SBY 22:24:24 [ticks_bmc] engine_0: smtbmc
+SBY 22:24:24 [ticks_bmc] base: starting process &quot;cd ticks_bmc/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 22:24:24 [ticks_bmc] base: finished (returncode=0)
+SBY 22:24:24 [ticks_bmc] prep: starting process &quot;cd ticks_bmc/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 22:24:24 [ticks_bmc] prep: finished (returncode=0)
+SBY 22:24:24 [ticks_bmc] smt2: starting process &quot;cd ticks_bmc/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 22:24:24 [ticks_bmc] smt2: finished (returncode=0)
+SBY 22:24:24 [ticks_bmc] engine_0: starting process &quot;cd ticks_bmc; yosys-smtbmc --presat --unroll --noprogress -t 30  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2&quot;
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Solver: yices
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 1..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 1..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 2..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 2..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 3..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 3..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 4..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 4..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 5..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 5..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 6..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 6..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 7..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 7..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 8..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 8..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 9..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 9..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 10..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 10..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 11..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 11..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 12..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 12..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 13..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 13..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 14..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 14..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 15..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 15..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 16..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 16..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 17..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 17..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 18..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 18..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 19..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 19..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 20..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 20..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 21..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 21..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 22..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 22..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 23..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 23..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 24..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 24..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 25..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 25..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 26..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 26..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 27..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 27..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 28..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 28..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assumptions in step 29..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Checking assertions in step 29..
+SBY 22:24:24 [ticks_bmc] engine_0: ##   0:00:00  Status: passed
+SBY 22:24:24 [ticks_bmc] engine_0: finished (returncode=0)
+SBY 22:24:24 [ticks_bmc] engine_0: Status returned by engine: pass
+SBY 22:24:24 [ticks_bmc] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:24:24 [ticks_bmc] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY 22:24:24 [ticks_bmc] summary: engine_0 (smtbmc) returned pass
+SBY 22:24:24 [ticks_bmc] summary: engine_0 did not produce any traces
+SBY 22:24:24 [ticks_bmc] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

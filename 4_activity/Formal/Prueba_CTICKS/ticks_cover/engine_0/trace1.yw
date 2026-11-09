@@ -1,0 +1,25 @@
+{
+  "format": "Yosys Witness Trace",
+  "generator": "smtbmc",
+  "clocks": [
+    {"path": ["\\clk"], "edge": "posedge", "offset": 0}
+  ],
+  "signals": [
+    {"path": ["\\bclk_tick"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\clk"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\clr"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\osm_sel"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\rst"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\urrst"], "width": 1, "offset": 0, "init_only": false},
+    {"path": ["\\_witness_", "\\anyinit_procdff_147"], "width": 4, "offset": 0, "init_only": true},
+    {"path": ["\\_witness_", "\\anyinit_procdff_148"], "width": 4, "offset": 0, "init_only": true},
+    {"path": ["\\_witness_", "\\anyinit_procdff_161"], "width": 1, "offset": 0, "init_only": true},
+    {"path": ["\\sample"], "width": 1, "offset": 0, "init_only": true},
+    {"path": ["\\tick_cnt"], "width": 4, "offset": 0, "init_only": true}
+  ],
+  "steps": [
+    {"bits": "11000000000000011000"},
+    {"bits": "001000"},
+    {"bits": "001000"}
+  ]
+}

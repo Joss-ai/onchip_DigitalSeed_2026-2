@@ -1,0 +1,310 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Executing script file `../model/design.ys' --
+
+1. Executing Verilog-2005 frontend: C_TICKS.v
+Parsing formal SystemVerilog input from `C_TICKS.v' to AST representation.
+Storing AST representation for module `$abstract\C_TICKS'.
+Successfully finished Verilog frontend.
+
+2. Executing PREP pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.2. Executing AST frontend in derive mode using pre-parsed AST for module `\C_TICKS'.
+Generating RTLIL representation for module `\C_TICKS'.
+
+2.2.1. Analyzing design hierarchy..
+Top module:  \C_TICKS
+
+2.2.2. Analyzing design hierarchy..
+Top module:  \C_TICKS
+Removing unused module `$abstract\C_TICKS'.
+Removed 1 unused modules.
+Module C_TICKS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+2.3. Executing PROC pass (convert processes to netlists).
+
+2.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$C_TICKS.v:57$55 in module C_TICKS.
+Marked 1 switch rules as full_case in process $proc$C_TICKS.v:49$37 in module C_TICKS.
+Marked 1 switch rules as full_case in process $proc$C_TICKS.v:43$32 in module C_TICKS.
+Marked 2 switch rules as full_case in process $proc$C_TICKS.v:17$18 in module C_TICKS.
+Removed a total of 0 dead cases.
+
+2.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 4 redundant assignments.
+Promoted 21 assignments to connections.
+
+2.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\C_TICKS.$proc$C_TICKS.v:35$91'.
+  Set init value: \f_past_valid = 1'0
+
+2.3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~13 debug messages>
+
+2.3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:35$91'.
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:64$68'.
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+     1/2: $assert$C_TICKS.v:61$66_EN
+     2/2: $assert$C_TICKS.v:59$63_EN
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+     1/4: $assert$C_TICKS.v:53$53_EN
+     2/4: $assert$C_TICKS.v:52$51_EN
+     3/4: $assert$C_TICKS.v:51$47_EN
+     4/4: $assert$C_TICKS.v:50$46_EN
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:43$32'.
+     1/2: $assert$C_TICKS.v:45$35_EN
+     2/2: $assert$C_TICKS.v:44$33_EN
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:40$28'.
+     1/1: $assume$C_TICKS.v:40$30_EN
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:37$25'.
+     1/1: $assume$C_TICKS.v:37$27_EN
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:36$24'.
+Creating decoders for process `\C_TICKS.$proc$C_TICKS.v:17$18'.
+     1/2: $0\sample[0:0]
+     2/2: $0\tick_cnt[3:0]
+
+2.3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:67$14$0' using process `\C_TICKS.$proc$C_TICKS.v:64$68'.
+  created $dff cell `$procdff$147' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:68$15$0' using process `\C_TICKS.$proc$C_TICKS.v:64$68'.
+  created $dff cell `$procdff$148' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:58$9$0' using process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+  created $dff cell `$procdff$149' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:58$10$0' using process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+  created $dff cell `$procdff$150' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:58$11$0' using process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+  created $dff cell `$procdff$151' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:60$12$0' using process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+  created $dff cell `$procdff$152' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:61$13$0' using process `\C_TICKS.$proc$C_TICKS.v:57$55'.
+  created $dff cell `$procdff$153' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:50$2$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$154' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:51$3$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$155' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:51$4$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$156' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:51$5$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$157' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:52$6$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$158' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:52$7$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$159' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:53$8$0' using process `\C_TICKS.$proc$C_TICKS.v:49$37'.
+  created $dff cell `$procdff$160' with positive edge clock.
+Creating register for signal `\C_TICKS.$past$C_TICKS.v:40$1$0' using process `\C_TICKS.$proc$C_TICKS.v:40$28'.
+  created $dff cell `$procdff$161' with positive edge clock.
+Creating register for signal `\C_TICKS.\f_past_valid' using process `\C_TICKS.$proc$C_TICKS.v:36$24'.
+  created $dff cell `$procdff$162' with positive edge clock.
+Creating register for signal `\C_TICKS.\tick_cnt' using process `\C_TICKS.$proc$C_TICKS.v:17$18'.
+  created $dff cell `$procdff$163' with positive edge clock.
+Creating register for signal `\C_TICKS.\sample' using process `\C_TICKS.$proc$C_TICKS.v:17$18'.
+  created $dff cell `$procdff$164' with positive edge clock.
+
+2.3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `C_TICKS.$proc$C_TICKS.v:35$91'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:64$68'.
+Found and cleaned up 3 empty switches in `\C_TICKS.$proc$C_TICKS.v:57$55'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:57$55'.
+Found and cleaned up 2 empty switches in `\C_TICKS.$proc$C_TICKS.v:49$37'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:49$37'.
+Found and cleaned up 2 empty switches in `\C_TICKS.$proc$C_TICKS.v:43$32'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:43$32'.
+Found and cleaned up 1 empty switch in `\C_TICKS.$proc$C_TICKS.v:40$28'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:40$28'.
+Found and cleaned up 1 empty switch in `\C_TICKS.$proc$C_TICKS.v:37$25'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:37$25'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:36$24'.
+Found and cleaned up 4 empty switches in `\C_TICKS.$proc$C_TICKS.v:17$18'.
+Removing empty process `C_TICKS.$proc$C_TICKS.v:17$18'.
+Cleaned up 13 empty switches.
+
+2.3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+<suppressed ~5 debug messages>
+
+2.4. Executing FUTURE pass.
+
+2.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+
+2.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_TICKS..
+Removed 2 unused cells and 60 unused wires.
+<suppressed ~3 debug messages>
+
+2.7. Executing CHECK pass (checking for obvious problems).
+Checking module C_TICKS...
+Found and reported 0 problems.
+
+2.8. Executing OPT pass (performing simple optimizations).
+
+2.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+
+2.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_TICKS'.
+Computing hashes of 91 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+Computing hashes of 86 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+<suppressed ~15 debug messages>
+Removed a total of 5 cells.
+
+2.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \C_TICKS..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~39 debug messages>
+
+2.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \C_TICKS.
+Performed a total of 0 changes.
+
+2.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_TICKS'.
+Computing hashes of 86 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+Computing hashes of 85 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+2.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_TICKS..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+2.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+
+2.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \C_TICKS..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~37 debug messages>
+
+2.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \C_TICKS.
+Performed a total of 0 changes.
+
+2.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_TICKS'.
+Computing hashes of 85 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+Removed a total of 0 cells.
+
+2.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_TICKS..
+
+2.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+
+2.8.14. Finished fast OPT passes. (There is nothing left to do.)
+
+2.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 2 bits (of 4) from mux cell C_TICKS.$ternary$C_TICKS.v:14$16 ($mux).
+Removed top 2 bits (of 4) from mux cell C_TICKS.$ternary$C_TICKS.v:15$17 ($mux).
+Removed top 3 bits (of 4) from port B of cell C_TICKS.$add$C_TICKS.v:27$22 ($add).
+Removed top 1 bits (of 4) from port B of cell C_TICKS.$eq$C_TICKS.v:29$23 ($eq).
+Removed top 1 bits (of 4) from port B of cell C_TICKS.$eq$C_TICKS.v:52$52 ($eq).
+Removed top 1 bits (of 4) from port B of cell C_TICKS.$eq$C_TICKS.v:53$54 ($eq).
+Removed top 2 bits (of 4) from wire C_TICKS.point.
+Removed top 2 bits (of 4) from wire C_TICKS.last.
+
+2.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_TICKS..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+2.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.12. Executing OPT pass (performing simple optimizations).
+
+2.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module C_TICKS.
+
+2.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\C_TICKS'.
+Computing hashes of 85 cells of `\C_TICKS'.
+Finding duplicate cells in `\C_TICKS'.
+Removed a total of 0 cells.
+
+2.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \C_TICKS..
+
+2.12.4. Finished fast OPT passes.
+
+2.13. Executing SORT pass.
+
+2.14. Printing statistics.
+
+=== C_TICKS ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       77 wires
+      109 wire bits
+       11 public wires
+       16 public wire bits
+        8 ports
+       11 port bits
+       85 cells
+        1   $add
+       14   $check
+       18   $dff
+        8   $eq
+        2   $le
+        9   $logic_and
+        3   $logic_not
+        6   $logic_or
+       24   $mux
+
+2.15. Executing CHECK pass (checking for obvious problems).
+Checking module C_TICKS...
+Found and reported 0 problems.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `C_TICKS'. Setting top module to C_TICKS.
+
+3.1. Analyzing design hierarchy..
+Top module:  \C_TICKS
+
+3.2. Analyzing design hierarchy..
+Top module:  \C_TICKS
+Removed 0 unused modules.
+Module C_TICKS directly or indirectly contains formal properties -> setting "keep" attribute.
+
+4. Executing jny backend.
+
+5. Executing RTLIL backend.
+Output filename: ../model/design.il
+
+End of script. Logfile hash: c3f83df876, time: 0.04s, user: 0.03s, system: 0.03s, MEM: 36.52 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 19% 5x opt_clean (0 sec), 17% 2x hierarchy (0 sec), ...

@@ -1,0 +1,83 @@
+initial
+assume (= [$auto$async2sync.cc:116:execute$213] true)
+assume (= [$auto$async2sync.cc:116:execute$219] true)
+assume (= [$auto$async2sync.cc:116:execute$225] true)
+assume (= [$auto$async2sync.cc:116:execute$231] true)
+assume (= [_witness_.anyinit_procdff_147] #b0000)
+assume (= [_witness_.anyinit_procdff_148] #b0000)
+assume (= [_witness_.anyinit_procdff_161] false)
+assume (= [f_past_valid] false)
+assume (= [sample] false)
+assume (= [tick_cnt] #b0000)
+
+state 0
+assume (= [bclk_tick] false)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] true)
+assume (= [urrst] false)
+
+state 1
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 2
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 3
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 4
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 5
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 6
+assume (= [bclk_tick] true)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 7
+assume (= [bclk_tick] false)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)
+
+state 8
+assume (= [bclk_tick] false)
+assume (= [clk] false)
+assume (= [clr] false)
+assume (= [osm_sel] true)
+assume (= [rst] false)
+assume (= [urrst] false)

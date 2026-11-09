@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-11-09T22:24:24" hostname="d91659a2365a" package="ticks" id="0" name="cover" tests="12" errors="0" failures="0" time="0" skipped="8">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="cover" name="build execution" time="0">
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:44.22-44.48" time="0" type="ASSERT" location="C_TICKS.v:44.22-44.48" id="_witness_.check_assert_C_TICKS_v_44_33">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:45.22-45.48" time="0" type="ASSERT" location="C_TICKS.v:45.22-45.48" id="_witness_.check_assert_C_TICKS_v_45_35">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:50.9-50.34" time="0" type="ASSERT" location="C_TICKS.v:50.9-50.34" id="_witness_.check_assert_C_TICKS_v_50_46">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:51.9-51.61" time="0" type="ASSERT" location="C_TICKS.v:51.9-51.61" id="_witness_.check_assert_C_TICKS_v_51_47">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:52.29-52.61" time="0" type="ASSERT" location="C_TICKS.v:52.29-52.61" id="_witness_.check_assert_C_TICKS_v_52_51">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:53.29-53.61" time="0" type="ASSERT" location="C_TICKS.v:53.29-53.61" id="_witness_.check_assert_C_TICKS_v_53_53">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:59.13-59.38" time="0" type="ASSERT" location="C_TICKS.v:59.13-59.38" id="_witness_.check_assert_C_TICKS_v_59_63">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property ASSERT in C_TICKS at C_TICKS.v:61.13-61.49" time="0" type="ASSERT" location="C_TICKS.v:61.13-61.49" id="_witness_.check_assert_C_TICKS_v_61_66">
+<skipped />
+</testcase>
+<testcase classname="cover" name="Property COVER in C_TICKS at C_TICKS.v:65.9-65.51" time="0" type="COVER" location="C_TICKS.v:65.9-65.51" id="_witness_.check_cover_C_TICKS_v_65_71" tracefile="engine_0/trace3.vcd">
+</testcase>
+<testcase classname="cover" name="Property COVER in C_TICKS at C_TICKS.v:66.9-66.51" time="0" type="COVER" location="C_TICKS.v:66.9-66.51" id="_witness_.check_cover_C_TICKS_v_66_75" tracefile="engine_0/trace2.vcd">
+</testcase>
+<testcase classname="cover" name="Property COVER in C_TICKS at C_TICKS.v:67.9-67.89" time="0" type="COVER" location="C_TICKS.v:67.9-67.89" id="_witness_.check_cover_C_TICKS_v_67_78" tracefile="engine_0/trace0.vcd">
+</testcase>
+<testcase classname="cover" name="Property COVER in C_TICKS at C_TICKS.v:68.9-68.89" time="0" type="COVER" location="C_TICKS.v:68.9-68.89" id="_witness_.check_cover_C_TICKS_v_68_85" tracefile="engine_0/trace1.vcd">
+</testcase>
+<system-out>SBY 22:24:23 [ticks_bmc] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_bmc'.
+SBY 22:24:24 [ticks_prove] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_prove'.
+SBY 22:24:24 [ticks_cover] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_cover'.
+SBY 22:24:24 [ticks_cover] Copy '/foss/designs/Digital/UART/Prueba_CTICKS/C_TICKS.v' to '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_cover/src/C_TICKS.v'.
+SBY 22:24:24 [ticks_cover] engine_0: smtbmc
+SBY 22:24:24 [ticks_cover] base: starting process &quot;cd ticks_cover/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 22:24:24 [ticks_cover] base: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] prep: starting process &quot;cd ticks_cover/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 22:24:24 [ticks_cover] prep: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] smt2: starting process &quot;cd ticks_cover/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 22:24:24 [ticks_cover] smt2: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] engine_0: starting process &quot;cd ticks_cover; yosys-smtbmc --presat --unroll -c --noprogress -t 25  --append 0 --dump-vcd engine_0/trace%.vcd --dump-yw engine_0/trace%.yw --dump-vlogtb engine_0/trace%_tb.v --dump-smtc engine_0/trace%.smtc model/design_smt2.smt2&quot;
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Solver: yices
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 0..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 1..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_TICKS: C_TICKS.v:67.9-67.89 (_witness_.check_cover_C_TICKS_v_67_78)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace0.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace0_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace0.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace0.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_TICKS: C_TICKS.v:68.9-68.89 (_witness_.check_cover_C_TICKS_v_68_85)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace1.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace1_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace1.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace1.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 3..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 4..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 5..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 6..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 7..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 8..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 8 at C_TICKS: C_TICKS.v:66.9-66.51 (_witness_.check_cover_C_TICKS_v_66_75)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace2.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace2_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace2.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace2.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 8..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 9..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 10..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 10 at C_TICKS: C_TICKS.v:65.9-65.51 (_witness_.check_cover_C_TICKS_v_65_71)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace3.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace3_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace3.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace3.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Status: passed
+SBY 22:24:24 [ticks_cover] engine_0: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] engine_0: Status returned by engine: pass
+SBY 22:24:24 [ticks_cover] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:24:24 [ticks_cover] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:24:24 [ticks_cover] summary: engine_0 (smtbmc) returned pass
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace0.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_67_78 at C_TICKS.v:67.9-67.89 step 2
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace1.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_68_85 at C_TICKS.v:68.9-68.89 step 2
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace2.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_66_75 at C_TICKS.v:66.9-66.51 step 8
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace3.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_65_71 at C_TICKS.v:65.9-65.51 step 10
+SBY 22:24:24 [ticks_cover] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

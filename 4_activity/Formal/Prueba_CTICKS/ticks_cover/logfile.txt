@@ -1,0 +1,62 @@
+SBY 22:24:23 [ticks_bmc] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_bmc'.
+SBY 22:24:24 [ticks_prove] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_prove'.
+SBY 22:24:24 [ticks_cover] Removing directory '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_cover'.
+SBY 22:24:24 [ticks_cover] Copy '/foss/designs/Digital/UART/Prueba_CTICKS/C_TICKS.v' to '/foss/designs/Digital/UART/Prueba_CTICKS/ticks_cover/src/C_TICKS.v'.
+SBY 22:24:24 [ticks_cover] engine_0: smtbmc
+SBY 22:24:24 [ticks_cover] base: starting process "cd ticks_cover/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 22:24:24 [ticks_cover] base: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] prep: starting process "cd ticks_cover/model; yosys -ql design_prep.log design_prep.ys"
+SBY 22:24:24 [ticks_cover] prep: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] smt2: starting process "cd ticks_cover/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 22:24:24 [ticks_cover] smt2: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] engine_0: starting process "cd ticks_cover; yosys-smtbmc --presat --unroll -c --noprogress -t 25  --append 0 --dump-vcd engine_0/trace%.vcd --dump-yw engine_0/trace%.yw --dump-vlogtb engine_0/trace%_tb.v --dump-smtc engine_0/trace%.smtc model/design_smt2.smt2"
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Solver: yices
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 0..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 1..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_TICKS: C_TICKS.v:67.9-67.89 (_witness_.check_cover_C_TICKS_v_67_78)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace0.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace0_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace0.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace0.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 2 at C_TICKS: C_TICKS.v:68.9-68.89 (_witness_.check_cover_C_TICKS_v_68_85)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace1.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace1_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace1.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace1.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 3..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 4..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 5..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 6..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 7..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 8..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 8 at C_TICKS: C_TICKS.v:66.9-66.51 (_witness_.check_cover_C_TICKS_v_66_75)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace2.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace2_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace2.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace2.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 8..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 9..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Checking cover reachability in step 10..
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Reached cover statement in step 10 at C_TICKS: C_TICKS.v:65.9-65.51 (_witness_.check_cover_C_TICKS_v_65_71)
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace3.vcd
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace3_tb.v
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace3.smtc
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace3.yw
+SBY 22:24:24 [ticks_cover] engine_0: ##   0:00:00  Status: passed
+SBY 22:24:24 [ticks_cover] engine_0: finished (returncode=0)
+SBY 22:24:24 [ticks_cover] engine_0: Status returned by engine: pass
+SBY 22:24:24 [ticks_cover] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:24:24 [ticks_cover] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:24:24 [ticks_cover] summary: engine_0 (smtbmc) returned pass
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace0.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_67_78 at C_TICKS.v:67.9-67.89 step 2
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace1.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_68_85 at C_TICKS.v:68.9-68.89 step 2
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace2.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_66_75 at C_TICKS.v:66.9-66.51 step 8
+SBY 22:24:24 [ticks_cover] summary: cover trace: ticks_cover/engine_0/trace3.vcd
+SBY 22:24:24 [ticks_cover] summary:   reached cover statement C_TICKS._witness_.check_cover_C_TICKS_v_65_71 at C_TICKS.v:65.9-65.51 step 10
+SBY 22:24:24 [ticks_cover] DONE (PASS, rc=0)

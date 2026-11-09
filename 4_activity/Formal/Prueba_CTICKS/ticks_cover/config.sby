@@ -1,0 +1,13 @@
+[options]
+mode cover
+depth 25
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv C_TICKS.v
+prep -top C_TICKS
+
+[files]
+C_TICKS.v
