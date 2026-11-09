@@ -1,0 +1,33 @@
+initial
+assume (= [$auto$async2sync.cc:107:execute$451] false)
+assume (= [$auto$async2sync.cc:116:execute$455] true)
+assume (= [$auto$async2sync.cc:116:execute$461] true)
+assume (= [$auto$async2sync.cc:116:execute$467] true)
+assume (= [$auto$async2sync.cc:116:execute$473] true)
+assume (= [_witness_.anyinit_procdff_345] #b000)
+assume (= [f_past_valid] false)
+assume (= [state] #b001)
+
+state 0
+assume (= [Done] false)
+assume (= [clk] false)
+assume (= [rst] true)
+assume (= [rxd_in] false)
+assume (= [sample] false)
+assume (= [urrst] false)
+
+state 1
+assume (= [Done] false)
+assume (= [clk] false)
+assume (= [rst] false)
+assume (= [rxd_in] false)
+assume (= [sample] false)
+assume (= [urrst] false)
+
+state 2
+assume (= [Done] false)
+assume (= [clk] false)
+assume (= [rst] false)
+assume (= [rxd_in] false)
+assume (= [sample] false)
+assume (= [urrst] false)

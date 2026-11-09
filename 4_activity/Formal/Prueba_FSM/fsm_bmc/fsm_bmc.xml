@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-11-09T22:26:01" hostname="d91659a2365a" package="fsm" id="0" name="bmc" tests="24" errors="0" failures="0" time="1" skipped="4">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="bmc" name="build execution" time="0">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:69.33-69.59" time="0" type="ASSERT" location="FSM.v:69.33-69.59" id="_witness_.check_assert_FSM_v_69_44">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:73.9-73.72" time="0" type="ASSERT" location="FSM.v:73.9-73.72" id="_witness_.check_assert_FSM_v_73_47">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:74.9-74.51" time="0" type="ASSERT" location="FSM.v:74.9-74.51" id="_witness_.check_assert_FSM_v_74_52">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:75.9-75.61" time="0" type="ASSERT" location="FSM.v:75.9-75.61" id="_witness_.check_assert_FSM_v_75_55">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:76.9-76.51" time="0" type="ASSERT" location="FSM.v:76.9-76.51" id="_witness_.check_assert_FSM_v_76_59">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:77.9-77.58" time="0" type="ASSERT" location="FSM.v:77.9-77.58" id="_witness_.check_assert_FSM_v_77_62">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:78.9-78.36" time="0" type="ASSERT" location="FSM.v:78.9-78.36" id="_witness_.check_assert_FSM_v_78_66">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:79.21-79.48" time="0" type="ASSERT" location="FSM.v:79.21-79.48" id="_witness_.check_assert_FSM_v_79_69">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:84.41-84.68" time="0" type="ASSERT" location="FSM.v:84.41-84.68" id="_witness_.check_assert_FSM_v_84_101">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:86.63-86.91" time="0" type="ASSERT" location="FSM.v:86.63-86.91" id="_witness_.check_assert_FSM_v_86_106">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:87.63-87.90" time="0" type="ASSERT" location="FSM.v:87.63-87.90" id="_witness_.check_assert_FSM_v_87_110">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:88.80-88.107" time="0" type="ASSERT" location="FSM.v:88.80-88.107" id="_witness_.check_assert_FSM_v_88_115">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:89.80-89.107" time="0" type="ASSERT" location="FSM.v:89.80-89.107" id="_witness_.check_assert_FSM_v_89_121">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:90.63-90.91" time="0" type="ASSERT" location="FSM.v:90.63-90.91" id="_witness_.check_assert_FSM_v_90_126">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:91.61-91.85" time="0" type="ASSERT" location="FSM.v:91.61-91.85" id="_witness_.check_assert_FSM_v_91_130">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:92.61-92.88" time="0" type="ASSERT" location="FSM.v:92.61-92.88" id="_witness_.check_assert_FSM_v_92_135">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:93.76-93.103" time="0" type="ASSERT" location="FSM.v:93.76-93.103" id="_witness_.check_assert_FSM_v_93_140">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:94.76-94.102" time="0" type="ASSERT" location="FSM.v:94.76-94.102" id="_witness_.check_assert_FSM_v_94_146">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:95.61-95.88" time="0" type="ASSERT" location="FSM.v:95.61-95.88" id="_witness_.check_assert_FSM_v_95_150">
+</testcase>
+<testcase classname="bmc" name="Property ASSERT in FSM at FSM.v:96.61-96.87" time="0" type="ASSERT" location="FSM.v:96.61-96.87" id="_witness_.check_assert_FSM_v_96_155">
+</testcase>
+<testcase classname="bmc" name="Property COVER in FSM at FSM.v:101.9-101.37" time="0" type="COVER" location="FSM.v:101.9-101.37" id="_witness_.check_cover_FSM_v_101_159">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in FSM at FSM.v:102.9-102.37" time="0" type="COVER" location="FSM.v:102.9-102.37" id="_witness_.check_cover_FSM_v_102_161">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in FSM at FSM.v:103.9-103.34" time="0" type="COVER" location="FSM.v:103.9-103.34" id="_witness_.check_cover_FSM_v_103_164">
+<skipped />
+</testcase>
+<testcase classname="bmc" name="Property COVER in FSM at FSM.v:104.9-104.65" time="0" type="COVER" location="FSM.v:104.9-104.65" id="_witness_.check_cover_FSM_v_104_166">
+<skipped />
+</testcase>
+<system-out>SBY 22:26:00 [fsm_bmc] Removing directory '/foss/designs/Digital/UART/Prueba_FSM/fsm_bmc'.
+SBY 22:26:00 [fsm_bmc] Copy '/foss/designs/Digital/UART/Prueba_FSM/FSM.v' to '/foss/designs/Digital/UART/Prueba_FSM/fsm_bmc/src/FSM.v'.
+SBY 22:26:00 [fsm_bmc] engine_0: smtbmc
+SBY 22:26:00 [fsm_bmc] base: starting process &quot;cd fsm_bmc/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 22:26:00 [fsm_bmc] base: finished (returncode=0)
+SBY 22:26:00 [fsm_bmc] prep: starting process &quot;cd fsm_bmc/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 22:26:00 [fsm_bmc] prep: finished (returncode=0)
+SBY 22:26:00 [fsm_bmc] smt2: starting process &quot;cd fsm_bmc/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 22:26:01 [fsm_bmc] smt2: finished (returncode=0)
+SBY 22:26:01 [fsm_bmc] engine_0: starting process &quot;cd fsm_bmc; yosys-smtbmc --presat --unroll --noprogress -t 30  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2&quot;
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Solver: yices
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 1..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 1..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 2..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 2..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 3..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 3..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 4..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 4..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 5..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 5..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 6..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 6..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 7..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 7..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 8..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 8..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 9..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 9..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 10..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 10..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 11..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 11..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 12..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 12..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 13..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 13..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 14..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 14..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 15..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 15..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 16..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 16..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 17..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 17..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 18..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 18..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 19..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 19..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 20..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 20..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 21..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 21..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 22..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 22..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 23..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 23..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 24..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 24..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 25..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 25..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 26..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 26..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 27..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 27..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 28..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 28..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assumptions in step 29..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Checking assertions in step 29..
+SBY 22:26:01 [fsm_bmc] engine_0: ##   0:00:00  Status: passed
+SBY 22:26:01 [fsm_bmc] engine_0: finished (returncode=0)
+SBY 22:26:01 [fsm_bmc] engine_0: Status returned by engine: pass
+SBY 22:26:01 [fsm_bmc] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 22:26:01 [fsm_bmc] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY 22:26:01 [fsm_bmc] summary: engine_0 (smtbmc) returned pass
+SBY 22:26:01 [fsm_bmc] summary: engine_0 did not produce any traces
+SBY 22:26:01 [fsm_bmc] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

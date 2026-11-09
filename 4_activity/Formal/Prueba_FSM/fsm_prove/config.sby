@@ -1,0 +1,13 @@
+[options]
+mode prove
+depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv FSM.v
+prep -top FSM
+
+[files]
+FSM.v

@@ -1,0 +1,8 @@
+# running in fsm_cover/src/
+read -formal -sv FSM.v
+prep -top FSM
+
+hierarchy -smtcheck
+rename -witness
+write_jny -no-connections ../model/design.json
+write_rtlil ../model/design.il

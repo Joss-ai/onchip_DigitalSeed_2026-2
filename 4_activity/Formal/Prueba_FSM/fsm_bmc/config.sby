@@ -1,0 +1,13 @@
+[options]
+mode bmc
+depth 30
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv FSM.v
+prep -top FSM
+
+[files]
+FSM.v

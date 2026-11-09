@@ -1,0 +1,408 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+
+-- Executing script file `../model/design.ys' --
+
+1. Executing Verilog-2005 frontend: FSM.v
+Parsing formal SystemVerilog input from `FSM.v' to AST representation.
+Storing AST representation for module `$abstract\FSM'.
+Successfully finished Verilog frontend.
+
+2. Executing PREP pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.2. Executing AST frontend in derive mode using pre-parsed AST for module `\FSM'.
+Generating RTLIL representation for module `\FSM'.
+
+2.2.1. Analyzing design hierarchy..
+Top module:  \FSM
+
+2.2.2. Analyzing design hierarchy..
+Top module:  \FSM
+Removing unused module `$abstract\FSM'.
+Removed 1 unused modules.
+Module FSM directly or indirectly contains formal properties -> setting "keep" attribute.
+
+2.3. Executing PROC pass (convert processes to netlists).
+
+2.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$FSM.v:83$71 in module FSM.
+Marked 6 switch rules as full_case in process $proc$FSM.v:30$32 in module FSM.
+Marked 1 switch rules as full_case in process $proc$FSM.v:25$30 in module FSM.
+Removed a total of 0 dead cases.
+
+2.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 35 assignments to connections.
+
+2.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\FSM.$proc$FSM.v:64$170'.
+  Set init value: \f_past_valid = 1'0
+
+2.3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~25 debug messages>
+
+2.3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\FSM.$proc$FSM.v:64$170'.
+Creating decoders for process `\FSM.$proc$FSM.v:100$157'.
+     1/4: $cover$FSM.v:104$166_EN
+     2/4: $cover$FSM.v:103$164_EN
+     3/4: $cover$FSM.v:102$161_EN
+     4/4: $cover$FSM.v:101$159_EN
+Creating decoders for process `\FSM.$proc$FSM.v:83$71'.
+     1/12: $assert$FSM.v:96$155_EN
+     2/12: $assert$FSM.v:95$150_EN
+     3/12: $assert$FSM.v:94$146_EN
+     4/12: $assert$FSM.v:93$140_EN
+     5/12: $assert$FSM.v:92$135_EN
+     6/12: $assert$FSM.v:91$130_EN
+     7/12: $assert$FSM.v:90$126_EN
+     8/12: $assert$FSM.v:89$121_EN
+     9/12: $assert$FSM.v:88$115_EN
+    10/12: $assert$FSM.v:87$110_EN
+    11/12: $assert$FSM.v:86$106_EN
+    12/12: $assert$FSM.v:84$101_EN
+Creating decoders for process `\FSM.$proc$FSM.v:72$46'.
+     1/7: $assert$FSM.v:79$69_EN
+     2/7: $assert$FSM.v:78$66_EN
+     3/7: $assert$FSM.v:77$62_EN
+     4/7: $assert$FSM.v:76$59_EN
+     5/7: $assert$FSM.v:75$55_EN
+     6/7: $assert$FSM.v:74$52_EN
+     7/7: $assert$FSM.v:73$47_EN
+Creating decoders for process `\FSM.$proc$FSM.v:69$43'.
+     1/1: $assert$FSM.v:69$44_EN
+Creating decoders for process `\FSM.$proc$FSM.v:66$40'.
+     1/1: $assume$FSM.v:66$42_EN
+Creating decoders for process `\FSM.$proc$FSM.v:65$39'.
+Creating decoders for process `\FSM.$proc$FSM.v:30$32'.
+     1/9: $6\next_state[2:0]
+     2/9: $5\next_state[2:0]
+     3/9: $4\next_state[2:0]
+     4/9: $3\next_state[2:0]
+     5/9: $2\next_state[2:0]
+     6/9: $1\next_state[2:0]
+     7/9: $1\clr[0:0]
+     8/9: $1\bit_en[0:0]
+     9/9: $1\shift_en[0:0]
+Creating decoders for process `\FSM.$proc$FSM.v:25$30'.
+     1/1: $0\state[2:0]
+
+2.3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\FSM.\clr' from process `\FSM.$proc$FSM.v:30$32'.
+No latch inferred for signal `\FSM.\shift_en' from process `\FSM.$proc$FSM.v:30$32'.
+No latch inferred for signal `\FSM.\bit_en' from process `\FSM.$proc$FSM.v:30$32'.
+No latch inferred for signal `\FSM.\next_state' from process `\FSM.$proc$FSM.v:30$32'.
+
+2.3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\FSM.$past$FSM.v:104$29$0' using process `\FSM.$proc$FSM.v:100$157'.
+  created $dff cell `$procdff$345' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:84$1$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$346' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:84$2$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$347' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:86$3$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$348' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:86$4$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$349' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:87$5$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$350' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:87$6$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$351' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:88$7$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$352' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:88$8$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$353' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:88$9$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$354' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:89$10$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$355' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:89$11$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$356' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:89$12$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$357' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:90$13$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$358' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:90$14$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$359' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:91$15$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$360' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:91$16$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$361' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:92$17$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$362' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:92$18$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$363' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:93$19$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$364' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:93$20$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$365' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:93$21$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$366' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:94$22$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$367' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:94$23$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$368' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:94$24$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$369' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:95$25$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$370' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:95$26$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$371' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:96$27$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$372' with positive edge clock.
+Creating register for signal `\FSM.$past$FSM.v:96$28$0' using process `\FSM.$proc$FSM.v:83$71'.
+  created $dff cell `$procdff$373' with positive edge clock.
+Creating register for signal `\FSM.\f_past_valid' using process `\FSM.$proc$FSM.v:65$39'.
+  created $dff cell `$procdff$374' with positive edge clock.
+Creating register for signal `\FSM.\state' using process `\FSM.$proc$FSM.v:25$30'.
+  created $dff cell `$procdff$375' with positive edge clock.
+
+2.3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `FSM.$proc$FSM.v:64$170'.
+Found and cleaned up 1 empty switch in `\FSM.$proc$FSM.v:100$157'.
+Removing empty process `FSM.$proc$FSM.v:100$157'.
+Found and cleaned up 13 empty switches in `\FSM.$proc$FSM.v:83$71'.
+Removing empty process `FSM.$proc$FSM.v:83$71'.
+Found and cleaned up 2 empty switches in `\FSM.$proc$FSM.v:72$46'.
+Removing empty process `FSM.$proc$FSM.v:72$46'.
+Found and cleaned up 1 empty switch in `\FSM.$proc$FSM.v:69$43'.
+Removing empty process `FSM.$proc$FSM.v:69$43'.
+Found and cleaned up 1 empty switch in `\FSM.$proc$FSM.v:66$40'.
+Removing empty process `FSM.$proc$FSM.v:66$40'.
+Removing empty process `FSM.$proc$FSM.v:65$39'.
+Found and cleaned up 6 empty switches in `\FSM.$proc$FSM.v:30$32'.
+Removing empty process `FSM.$proc$FSM.v:30$32'.
+Found and cleaned up 1 empty switch in `\FSM.$proc$FSM.v:25$30'.
+Removing empty process `FSM.$proc$FSM.v:25$30'.
+Cleaned up 25 empty switches.
+
+2.3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+<suppressed ~16 debug messages>
+
+2.4. Executing FUTURE pass.
+
+2.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+
+2.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+Removed 2 unused cells and 133 unused wires.
+<suppressed ~3 debug messages>
+
+2.7. Executing CHECK pass (checking for obvious problems).
+Checking module FSM...
+Found and reported 0 problems.
+
+2.8. Executing OPT pass (performing simple optimizations).
+
+2.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+
+2.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\FSM'.
+Computing hashes of 210 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Computing hashes of 180 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Computing hashes of 179 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+<suppressed ~93 debug messages>
+Removed a total of 31 cells.
+
+2.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \FSM..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$319.
+    dead port 2/2 on $mux $procmux$309.
+    dead port 2/2 on $mux $procmux$300.
+    dead port 2/2 on $mux $procmux$292.
+    dead port 2/2 on $mux $procmux$285.
+Removed 5 multiplexer ports.
+<suppressed ~95 debug messages>
+
+2.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \FSM.
+    New ctrl vector for $pmux cell $procmux$329: $auto$opt_reduce.cc:137:opt_pmux$377
+  Optimizing cells in module \FSM.
+Performed a total of 1 changes.
+
+2.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\FSM'.
+Computing hashes of 175 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Computing hashes of 165 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+<suppressed ~30 debug messages>
+Removed a total of 10 cells.
+
+2.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+Removed 0 unused cells and 46 unused wires.
+<suppressed ~1 debug messages>
+
+2.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+<suppressed ~2 debug messages>
+
+2.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \FSM..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~70 debug messages>
+
+2.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \FSM.
+Performed a total of 0 changes.
+
+2.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\FSM'.
+Computing hashes of 163 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Removed a total of 0 cells.
+
+2.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+2.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+
+2.8.14. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.8.15. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \FSM..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~70 debug messages>
+
+2.8.16. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \FSM.
+Performed a total of 0 changes.
+
+2.8.17. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\FSM'.
+Computing hashes of 163 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Removed a total of 0 cells.
+
+2.8.18. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+
+2.8.19. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+
+2.8.20. Finished fast OPT passes. (There is nothing left to do.)
+
+2.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 3) from mux cell FSM.$ternary$FSM.v:41$34 ($mux).
+Removed top 2 bits (of 3) from port B of cell FSM.$eq$FSM.v:88$112 ($eq).
+Removed top 2 bits (of 3) from port B of cell FSM.$eq$FSM.v:89$117 ($eq).
+Removed top 2 bits (of 3) from port B of cell FSM.$eq$FSM.v:90$123 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$eq$FSM.v:91$128 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$eq$FSM.v:92$132 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$eq$FSM.v:93$137 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$eq$FSM.v:94$142 ($eq).
+Removed top 2 bits (of 3) from port B of cell FSM.$eq$FSM.v:104$167 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$procmux$324_CMP0 ($eq).
+Removed top 2 bits (of 3) from port B of cell FSM.$procmux$326_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell FSM.$procmux$341_CMP0 ($eq).
+Removed top 1 bits (of 3) from wire FSM.$ternary$FSM.v:41$34_Y.
+
+2.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+2.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.12. Executing OPT pass (performing simple optimizations).
+
+2.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module FSM.
+
+2.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\FSM'.
+Computing hashes of 163 cells of `\FSM'.
+Finding duplicate cells in `\FSM'.
+Removed a total of 0 cells.
+
+2.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \FSM..
+
+2.12.4. Finished fast OPT passes.
+
+2.13. Executing SORT pass.
+
+2.14. Printing statistics.
+
+=== FSM ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      144 wires
+      188 wire bits
+       14 public wires
+       18 public wire bits
+       11 ports
+       11 port bits
+      163 cells
+       25   $check
+       31   $dff
+       17   $eq
+        1   $le
+       22   $logic_and
+       11   $logic_not
+        3   $logic_or
+       50   $mux
+        1   $pmux
+        1   $reduce_bool
+        1   $reduce_or
+
+2.15. Executing CHECK pass (checking for obvious problems).
+Checking module FSM...
+Found and reported 0 problems.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `FSM'. Setting top module to FSM.
+
+3.1. Analyzing design hierarchy..
+Top module:  \FSM
+
+3.2. Analyzing design hierarchy..
+Top module:  \FSM
+Removed 0 unused modules.
+Module FSM directly or indirectly contains formal properties -> setting "keep" attribute.
+
+4. Executing jny backend.
+
+5. Executing RTLIL backend.
+Output filename: ../model/design.il
+
+End of script. Logfile hash: 8a8e5c6a14, time: 0.04s, user: 0.04s, system: 0.01s, MEM: 36.76 MB peak
+Yosys 0.67 (git sha1 2d1509d1b, Release, GNU /usr/bin/c++ 13.3.0)
+Time spent: 21% 2x hierarchy (0 sec), 18% 6x opt_clean (0 sec), ...

@@ -1,0 +1,22 @@
+[tasks]
+bmc
+prove
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 30
+prove: mode prove
+prove: depth 20
+cover: mode cover
+cover: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv FSM.v
+prep -top FSM
+
+[files]
+FSM.v
