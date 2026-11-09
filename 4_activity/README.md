@@ -9,7 +9,7 @@ This repository contains the design and formal verification of the reciver timin
 ├── README.md
 ├── Formal/
     ├── SRC_Formal/ # Source code and .sby configuration for the reciver timing and control   
-    ├── Results/ # Source code and .sby configuration for the Receiver FIFO 
+    ├── Results/ # Screenshots of the results 
     └── README.md
 └── SRC/ # Source code for the Receiver FIFO
     └── README.md
