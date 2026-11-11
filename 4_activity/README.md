@@ -1,43 +1,43 @@
-# UART Reciver timing and control
+# Receiver Timing and Control del UART
 
-This repository contains the design and formal verification of the reciver timing and control for a UART system.
+Este repositorio contiene el diseño y la verificación formal del Receiver Timing and Control de un sistema UART.
 
-## Directory Structure
+## Estructura de directorios
 
 ```text
 4_activity/
 ├── README.md
-├── Formal/                # Source code and .sby configuration for the receiver timing and control
+├── Formal/                # Código fuente y configuración .sby del receiver timing and control
 │   ├── Prueba_CBITS/
 │   ├── Prueba_CTICKS/
 │   ├── Prueba_FSM/
 │   └── README.md
-└── SRC/                   # Source code for the Receiver FIFO
+└── SRC/                   # Código fuente del FIFO de recepción
     └── README.md
 ```
 
-## Running the Formal Verification
+## Ejecución de la verificación formal
 
-To run formal verification on the SystemVerilog modules using SymbiYosys, run the following command inside each test folder:
+Para ejecutar la verificación formal de los módulos SystemVerilog con SymbiYosys, corre el siguiente comando dentro de cada carpeta de prueba:
 
 ```text
 sby -f archivo.sby
 ```
 
-| Flag | Purpose |
+| Opción | Propósito |
 |---|---|
-| `-f` | Forces SymbiYosys to overwrite any previous output directories and execute a clean run. |
+| `-f` | Obliga a SymbiYosys a sobrescribir los directorios de salida anteriores y a ejecutar una corrida limpia. |
 
-## `.sby` Configuration Structure
+## Estructura de la configuración `.sby`
 
-Each `.sby` file is divided into sections:
+Cada archivo `.sby` se divide en secciones:
 
-| Section | Purpose |
+| Sección | Propósito |
 |---|---|
-| `[options]` | Verification mode and depth. |
-| `[engines]` | Solver used to check the properties. |
-| `[script]` | RTL files to read and the top-level module under test. |
-| `[files]` | Local source files copied into the SymbiYosys workspace. |
+| `[options]` | Modo de verificación y profundidad. |
+| `[engines]` | Solver usado para comprobar las propiedades. |
+| `[script]` | Archivos RTL a leer y módulo superior bajo prueba. |
+| `[files]` | Archivos fuente locales que se copian al espacio de trabajo de SymbiYosys. |
 
 ```text
 [options]
@@ -57,45 +57,45 @@ bcd.sv
 
 ### `[options]`
 
-## Formal Verification Commands
+## Comandos de verificación formal
 
-These constructs are written inside each module, wrapped in `` `ifdef FORMAL ``, so they are only used by SymbiYosys and ignored in synthesis.
+Estas construcciones se escriben dentro de cada módulo, envueltas en `` `ifdef FORMAL ``, por lo que solo las usa SymbiYosys y se ignoran en la síntesis.
 
-| Command | Purpose |
+| Comando | Propósito |
 |---|---|
-| `assume` | Restricts the **inputs**: tells the solver which input behaviors are allowed. |
-| `assert` | Checks the **outputs and internal behavior**: the property that must hold in every reachable cycle. |
-| `cover` | Forces the solver to find at least one execution that reaches a condition. It proves the case is reachable, so the assumptions are not too strict. |
-| `f_past_valid` | Flag that is `0` only in the first cycle and `1` afterwards. It allows using past values (`$past`) and defining initial conditions, for example reset active in the first cycle. |
+| `assume` | Restringe las **entradas**: le indica al solver qué comportamientos de entrada están permitidos. |
+| `assert` | Verifica las **salidas y el comportamiento interno**: la propiedad que debe cumplirse en cada ciclo alcanzable. |
+| `cover` | Obliga al solver a encontrar al menos una ejecución que alcance una condición. Demuestra que el caso es alcanzable, es decir, que las suposiciones no son demasiado estrictas. |
+| `f_past_valid` | Bandera que vale `0` solo en el primer ciclo y `1` después. Permite usar valores pasados (`$past`) y definir condiciones iniciales, por ejemplo reset activo en el primer ciclo. |
 
 ```verilog
 reg f_past_valid = 1'b0;
 always @(posedge clk) f_past_valid <= 1'b1;
 
-always @* if (!f_past_valid) assume (rst);   // always start with reset
+always @* if (!f_past_valid) assume (rst);   // siempre empezar con reset
 ```
 
 ### `$stable`
 
-`$stable(x)` is true when `x` has the same value as in the previous clock cycle. It is a shorthand for `x == $past(x)`.
+`$stable(x)` es verdadero cuando `x` tiene el mismo valor que en el ciclo de reloj anterior. Es una forma abreviada de `x == $past(x)`.
 
 ```verilog
 always @(posedge clk) if (f_past_valid) assume ($stable(osm_sel));
 ```
 
-While `assume (d <= 9)` limits the **value** of an input, `$stable` limits **how it changes over time**. In this design it models configuration signals (`osm_sel`, `wls`, `pen`) that do not change while a character is being received. It is wrapped in `f_past_valid` because the first cycle has no previous cycle.
+Mientras que `assume (d <= 9)` limita el **valor** de una entrada, `$stable` limita **cómo cambia en el tiempo**. En este diseño modela las señales de configuración (`osm_sel`, `wls`, `pen`) que no cambian mientras se recibe un carácter. Está envuelto en `f_past_valid` porque el primer ciclo no tiene ciclo anterior.
 
-## Types of Proofs
+## Tipos de pruebas
 
-| Task | Description |
+| Tarea | Descripción |
 |---|---|
-| `bmc` | Bounded model checking. Always starts from reset (the first cycle is forced with `f_past_valid`) and checks the properties up to `depth` clock cycles. Finds bugs, but does not prove the design for all cycles. |
-| `prove` | Proof by k-induction. The base case starts from reset, but the induction step can start from **any state**, so it does not rely on `f_past_valid` to start at reset. Proves the properties for all cycles. |
-| `cover` | Reachability analysis. Checks that every `cover` statement can be reached. |
+| `bmc` | Verificación de modelo acotada (*bounded model checking*). Siempre parte del reset (el primer ciclo se fuerza con `f_past_valid`) y comprueba las propiedades hasta `depth` ciclos de reloj. Encuentra errores, pero no demuestra el diseño para todos los ciclos. |
+| `prove` | Prueba por k-inducción. El caso base parte del reset, pero el paso inductivo puede partir de **cualquier estado**, por lo que no depende de `f_past_valid` para empezar en reset. Demuestra las propiedades para todos los ciclos. |
+| `cover` | Análisis de alcanzabilidad. Comprueba que se pueda alcanzar cada sentencia `cover`. |
 
-If `prove` fails in the induction step while `bmc` passes, the counterexample usually starts from an unreachable state. Check the first instant of the generated `.vcd` before assuming a design bug.
+Si `prove` falla en el paso inductivo mientras `bmc` pasa, el contraejemplo normalmente parte de un estado inalcanzable. Revisa el primer instante del `.vcd` generado antes de asumir que hay un error de diseño.
 
-## Execution
+## Ejecución
 
 ```text
 sby -f nombre.sby          # runs all tasks (bmc, prove, cover)
