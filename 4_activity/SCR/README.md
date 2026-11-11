@@ -64,22 +64,10 @@ La figura sale de la simulación real del diseño: una trama **8O1** (8 datos, p
 
 ## 3. Máquina de estados
 
-<table>
-<tr>
-<th align="center">Esquema original (borrador)</th>
-<th align="center">Versión final (optimizada)</th>
-</tr>
-<tr>
-<td width="38%"><img src="img/fsm_borrador.png" alt="FSM borrador" width="100%"></td>
-<td width="62%"><img src="img/fsm_final.png" alt="FSM final" width="100%"></td>
-</tr>
-</table>
 
-**Qué cambió respecto al borrador**
 
-- **Se agregó el estado ESPERA.** Si el stop llega en 0 (error de *framing*), el receptor espera a que la línea suba a 1 antes de buscar otro start. Sin esto, un *break* (línea en 0 por mucho tiempo) generaría caracteres falsos.
-- **SALIDA ya no vuelve a ENTRADA BITS.** En SALIDA se está leyendo el bit de stop; un 0 ahí no significa "más datos", sino error de *framing*.
-- **SALIDA espera el `sample` del stop** antes de decidir. En el borrador decidía en cuanto llegaba `Done`, sin leer el stop.
+<img width="1211" height="1507" alt="Screenshot_20261110_203041_Samsung Notes" src="https://github.com/user-attachments/assets/57806575-6dfa-42c0-9612-27487f733933" />
+
 
 | Estado | Salidas de control | Qué hace | Sale cuando |
 |---|---|---|---|
