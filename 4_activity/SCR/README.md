@@ -29,6 +29,30 @@ Solo se verifica el primer bit de stop; si el transmisor envía 1,5 o 2, el rest
 <img width="1215" height="96" alt="Screenshot_20261110_203238_Samsung Notes" src="https://github.com/user-attachments/assets/8db7b8a4-af1b-4f12-9eed-42cd8326b3b1" />
 
 
+La figura muestra el formato de la trama serial tal como viaja por la línea `UARTn_RXD` (el transmisor usa el mismo formato en `UARTn_TXD`). Cuando no hay transmisión, la línea permanece en 1 (reposo). Cada trama se compone, en este orden, de:
+
+| Parte | Valor | Descripción |
+|---|---|---|
+| START | Siempre 0 | Avisa que empieza una trama. El paso de 1 a 0 (flanco de bajada) es lo que detecta el receptor |
+| D0 a D7 | Dato | De 5 a 8 bits según `wls`, empezando por el menos significativo (D0). Con menos de 8 bits se usan solo los primeros |
+| PARITY | Opcional | Solo existe si `pen = 1`. Sirve para detectar si algún bit se dañó en el camino |
+| STOP1, STOP2 | Siempre 1 | Marcan el final y devuelven la línea al reposo. El transmisor puede enviar 1, 1,5 o 2, pero el receptor **solo verifica STOP1** |
+
+Transmisor y receptor no comparten reloj; solo acuerdan de antemano la velocidad (*baud rate*). Para sincronizarse, el receptor usa el pulso `bclk_tick` del divisor de baudios, que se repite **16 veces por cada bit** (13 si `osm_sel = 1`). Cada pulso es un *tick*, así que cada bit dura 16 ticks. Esto es lo que representa el círculo punteado sobre D1: cada bit se subdivide en 16 ciclos de BCLK (la ampliación no se muestra en la figura).
+
+El receptor cuenta los ticks y lee la línea en el **tick 8** de cada bit (tick 6 en modo 13×), es decir, en su centro, donde la señal es más estable porque en los bordes puede haber ruido o pequeñas diferencias de tiempo. Ese instante lo marca la señal `sample`.
+
+La recepción de una trama sigue estos pasos:
+
+1. **Flanco de bajada:** la línea cae de 1 a 0 y el receptor arranca el conteo de ticks.
+2. **START:** en el primer `sample` comprueba que la línea siga en 0. Si ya subió, fue ruido y se descarta.
+3. **D0 a D7:** en cada `sample` lee un bit y lo desplaza al registro RSR; el contador de bits avanza hasta activar `Done`.
+4. **PARITY:** se lee como un bit más y se compara con la paridad calculada de los datos (`pe`).
+5. **STOP1:** el siguiente `sample` cae en el centro del stop. Si vale 0 hay error de *framing* (`fe`); si toda la trama estuvo en 0, es un *break* (`bi`).
+6. **Entrega:** se coloca el carácter en `rx_data` y se activa `rx_push` por un ciclo. Si el FIFO está lleno, no hay push y se activa `oe`.
+
+Como el contador de ticks es circular, después de validar el start cada `sample` cae justo en el centro del bit siguiente, sin reiniciar el conteo. Los errores `pe`, `fe` y `bi` se guardan junto con el carácter y viajan con él al FIFO.
+
 
 ### Entradas y salidas
 
@@ -61,6 +85,24 @@ Solo se verifica el primer bit de stop; si el transmisor envía 1,5 o 2, el rest
 
 <img width="1211" height="1507" alt="Screenshot_20261110_203041_Samsung Notes" src="https://github.com/user-attachments/assets/57806575-6dfa-42c0-9612-27487f733933" />
 
+La máquina de estados controla la secuencia de la recepción. Cada círculo es un estado y cada flecha una transición con la condición que la activa; las flechas que vuelven al mismo estado indican que se queda esperando mientras la condición no se cumple. Las condiciones usan tres señales: `rxd_in` (la línea serial, ya sincronizada), `sample` (centro del bit, generada por `C_TICKS`) y `Done` (ya llegaron todos los bits, generada por `C_BITS`).
+
+**Camino normal (carácter correcto):**
+
+1. **INICIAL:** la línea está en reposo y los contadores y el RSR se mantienen en 0. Cuando `rxd_in = 0` (flanco de bajada) pasa a REVISIÓN.
+2. **REVISIÓN:** cuenta ticks hasta el centro del bit de start. En ese `sample`, si la línea sigue en 0, el start es válido y pasa a ENTRADA BITS.
+3. **ENTRADA BITS:** en cada `sample` se lee un bit y se desplaza al RSR. Cuando `Done = 1` (llegaron todos los bits de dato y la paridad, si la hay) pasa a SALIDA.
+4. **SALIDA:** espera el `sample` del bit de stop. Si `rxd_in = 1`, el carácter es válido: se entrega al FIFO y vuelve a INICIAL.
+
+**Caminos de descarte o error:**
+
+- **REVISIÓN → INICIAL:** si en el `sample` del start la línea ya volvió a 1, fue un pulso de ruido y se ignora. No se genera ningún carácter.
+- **SALIDA → ESPERA:** si en el `sample` del stop la línea vale 0, hay error de *framing* (`fe = 1`). El carácter se entrega igual, con su bit de error, pero el receptor no vuelve a buscar un start todavía.
+- **ESPERA → INICIAL:** el receptor espera a que la línea suba a 1. Esto evita que un *break* (línea en 0 durante mucho tiempo) se interprete como una cadena de caracteres falsos.
+
+SALIDA no regresa a ENTRADA BITS: en ese estado se está leyendo el bit de stop, y un 0 ahí no significa que vengan más datos, sino un error de *framing*. Cada trama nueva debe pasar siempre por INICIAL y REVISIÓN.
+
+La tabla siguiente resume, para cada estado, qué señales de control activa la FSM y cuándo sale de él.
 
 | Estado | Salidas de control | Qué hace | Sale cuando |
 |---|---|---|---|
