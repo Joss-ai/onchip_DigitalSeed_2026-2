@@ -24,18 +24,11 @@ Solo se verifica el primer bit de stop; si el transmisor envía 1,5 o 2, el rest
 
 ## 2. Ciclo de recepción
 
-La figura sale de la simulación real del diseño: una trama **8O1** (8 datos, paridad impar, 1 stop) con el dato `0x4B`, en modo 16× (`osm_sel = 0`).
 
-![Ciclo de recepción](img/ciclo_recepcion.png)
 
-**Cómo leer la figura**
+<img width="1215" height="96" alt="Screenshot_20261110_203238_Samsung Notes" src="https://github.com/user-attachments/assets/8db7b8a4-af1b-4f12-9eed-42cd8326b3b1" />
 
-1. **Flanco de bajada.** Con la línea en reposo (1), `rxd_in` cae a 0. La FSM sale de INICIAL y pasa a REVISIÓN; el contador de ticks arranca.
-2. **Ticks.** `tick_cnt` cuenta de 0 a 15: 16 ticks son un bit. La señal `sample` se activa en el tick 8, es decir, en el centro del bit (en modo 13× se activa en el tick 6 de 13).
-3. **Start.** En el primer `sample` la FSM comprueba que la línea siga en 0. Si ya subió, fue ruido y vuelve a INICIAL.
-4. **Datos y paridad.** En cada `sample` siguiente (uno por bit) se lee `rxd_in` y se desplaza al RSR. `C_BITS` cuenta los bits recibidos; al llegar a 9 (8 datos + paridad) activa `Done`.
-5. **Stop.** El siguiente `sample` cae en el centro del bit de stop. Ahí la FSM activa `char_done`, y se calculan `fe`, `bi`, `pe` y si hay `oe`.
-6. **Salida.** Un ciclo de reloj después se activa `rx_push`, con `rx_data`, `pe`, `fe` y `bi` ya registrados y estables. El FIFO guarda el carácter al ver `rx_push`.
+
 
 ### Entradas y salidas
 
