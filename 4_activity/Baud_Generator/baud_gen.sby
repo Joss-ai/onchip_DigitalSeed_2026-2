@@ -1,0 +1,22 @@
+[tasks]
+bmc
+prove
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+prove: mode prove
+prove: depth 8
+cover: mode cover
+cover: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal baud_gen.sv
+prep -top baud_gen
+
+[files]
+baud_gen.sv
