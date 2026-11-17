@@ -15,7 +15,7 @@ BaudGen/
   baud_gen.sby         # tareas: bmc, prove, cover
 ```
 
-Igual que en los ejemplos de clase (`abs8`, `bcd_inc`, `mod1000`, `sticky_flag`): una carpeta por módulo, el RTL y el `.sby` juntos, y las propiedades dentro de `` `ifdef FORMAL `` para que **no** se sinteticen.
+Igual que en los ejemplos (`abs8`, `bcd_inc`, `mod1000`, `sticky_flag`): una carpeta por módulo, el RTL y el `.sby` juntos, y las propiedades dentro de `` `ifdef FORMAL `` para que **no** se sinteticen.
 
 ## 2. Cómo ejecutarlo
 
