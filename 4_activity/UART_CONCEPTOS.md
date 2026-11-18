@@ -84,7 +84,7 @@ La CPU lo controla **leyendo y escribiendo registros** a través de un bus de pe
 > | 3. Receiver Timing and Control (incluye RSR) | 4.6 | |
 > | 4. Transmitter Timing and Control (incluye TSR) | 4.5 | |
 > | 5. **Control Logic** (mi bloque) | 4.1, 4.2 y los latches de 4.3 | 4.2 y los latches DLL/DLH **no son bloques aparte** en el docx: están dentro del Control Logic |
-> | 6. Interrupt / Event Control (incluye árbitro, timeout e **IIR**) | 4.8 | El **IIR lo genera este bloque**; tu Control Logic solo lo recibe (`iir_data`) y lo presenta en el bus |
+> | 6. Interrupt / Event Control (incluye árbitro, timeout e **IIR**) | 4.8 | El **IIR lo genera este bloque**; la Control Logic solo lo recibe (`iir_data`) y lo presenta en el bus |
 > | *(no existe)* | 4.3 (Baud generator) | El docx **no** lo define como bloque |
  
 ### 4.1 Control Logic (mi bloque)
