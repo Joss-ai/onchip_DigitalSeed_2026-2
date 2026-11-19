@@ -1,0 +1,22 @@
+[tasks]
+bmc
+prove
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 40
+prove: mode prove
+prove: depth 20
+cover: mode cover
+cover: depth 120
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv uart_tx_ctrl.v
+prep -top uart_tx_ctrl
+
+[files]
+uart_tx_ctrl.v

@@ -1,0 +1,842 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>uart_tx_ctrl.sv explicado</title></head><body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lectura de código por segmentos; cada segmento es una fila con el código a la izquierda y la explicación a la derecha (apilado en móvil) */
+:root{
+  --paper:#F1F3F0; --panel:#FFFFFF; --ink:#17201C; --muted:#5A655F; --line:#CDD4CF;
+  --accent:#A8530A; --accent-soft:#F6E6D6; --edge:#B5543A;
+  --code-bg:#F7F8F6; --c-start:#C92A2A; --c-data:#1864AB; --c-par:#8E33A8; --c-stop:#2B7A3B; --c-idle:#6B7670; --k:#8E33A8; --n:#1864AB; --st:#B5543A; --cm:#2B7A3B;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A; --edge:#E07A5F;
+  --code-bg:#151B18; --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#9AA59F; --k:#D88AF0; --n:#5AB0F7; --st:#F09A82; --cm:#6FD883; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A; --edge:#E07A5F;
+  --code-bg:#151B18; --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#9AA59F; --k:#D88AF0; --n:#5AB0F7; --st:#F09A82; --cm:#6FD883; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:0 56px}
+.wrap{max-width:1180px; margin:0 auto; display:grid; gap:18px}
+h1,h2,h3{font-family:var(--f-display); margin:0; line-height:1.15; text-wrap:balance}
+h1{font-size:clamp(1.9rem,4.6vw,3rem); font-weight:800; letter-spacing:-.02em}
+h2{font-size:1.25rem; font-weight:800}
+code{font-family:var(--f-mono); font-size:.84em; background:var(--accent-soft); padding:.05em .35em; border-radius:4px}
+.eyebrow{font-family:var(--f-mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+header{padding-block:36px 18px; display:grid; gap:10px; border-bottom:2px solid var(--ink)}
+header p{max-width:72ch; margin:0}
+
+.map{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:6px 14px}
+.map a{font-size:.9rem; color:var(--ink); text-decoration:none; padding:4px 0; border-bottom:1px dashed var(--line)}
+.map a b{font-family:var(--f-mono); color:var(--accent); margin-right:6px; font-weight:600}
+.map a:hover, .map a:focus-visible{color:var(--accent); outline:none}
+
+.groups{display:flex; flex-wrap:wrap; gap:8px; font-size:.85rem}
+.groups span{border:1px solid var(--line); background:var(--panel); padding:4px 10px; border-radius:999px}
+.groups b{font-family:var(--f-mono); color:var(--accent)}
+
+.seg{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:grid; gap:12px; scroll-margin-top:16px}
+.seg-head{display:flex; gap:14px; align-items:center}
+.num{font-family:var(--f-display); font-weight:800; font-size:1.9rem; color:var(--edge); line-height:1; min-width:2.2ch}
+.ttl{display:grid; gap:2px}
+.meta{font-family:var(--f-mono); font-size:.75rem; color:var(--muted)}
+.tag{color:var(--accent); border:1px solid var(--accent); border-radius:4px; padding:0 6px; margin-right:6px}
+.seg-body{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:16px; align-items:start}
+@media (max-width:880px){ .seg-body{grid-template-columns:1fr} }
+.code{background:var(--code-bg); border:1px solid var(--line); border-radius:8px; overflow-x:auto; min-width:0}
+.code pre{margin:0; padding:12px 14px; font-family:var(--f-mono); font-size:.8rem; line-height:1.55}
+.ln{color:var(--muted); opacity:.6; user-select:none}
+.kw{color:var(--k); font-weight:600} .nm{color:var(--n)} .st{color:var(--st); font-weight:600} .op{color:var(--accent)}
+.exp{display:grid; gap:10px; min-width:0}
+.sum{margin:0; font-size:1.02rem}
+.pts{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+.pts li{display:grid; gap:2px; padding-left:12px; border-left:2px solid var(--line)}
+.pts li code{justify-self:start; white-space:normal; word-break:break-word}
+.pts li span{font-size:.94rem}
+.q{margin:0; font-size:.92rem; background:var(--paper); border-left:3px solid var(--accent); padding:7px 11px; border-radius:0 6px 6px 0}
+
+.walk{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:grid; gap:10px}
+.walk ol{margin:0; padding-left:1.3em; display:grid; gap:6px}
+.walk li{font-size:.95rem}
+.walk a{color:var(--accent); font-family:var(--f-mono); font-size:.85rem}
+details.full{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 16px}
+details.full summary{cursor:pointer; font-family:var(--f-display); font-weight:800; font-size:1.15rem}
+details.full .code{margin-top:10px}
+
+.fsm{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:grid; gap:14px; scroll-margin-top:16px}
+.fsm .lead{margin:0; max-width:75ch}
+.fsmdiag{overflow-x:auto; background:var(--code-bg); border:1px solid var(--line); border-radius:10px}
+.fsmdiag svg{display:block; width:100%; min-width:760px; height:auto}
+.sbox{stroke-width:2.2}
+.s-IDLE{fill:var(--panel); stroke:var(--c-idle)} .s-START{fill:var(--panel); stroke:var(--c-start)} .s-DATOS{fill:var(--panel); stroke:var(--c-data)} .s-PARIDAD{fill:var(--panel); stroke:var(--c-par)} .s-STOP{fill:var(--panel); stroke:var(--c-stop)}
+.sname{font-family:var(--f-display); font-weight:800; font-size:17px}
+.n-IDLE{fill:var(--c-idle)} .n-START{fill:var(--c-start)} .n-DATOS{fill:var(--c-data)} .n-PARIDAD{fill:var(--c-par)} .n-STOP{fill:var(--c-stop)}
+.ssub{fill:var(--muted); font-family:var(--f-mono); font-size:11px}
+.tr{stroke:var(--ink); stroke-width:1.7; fill:none}
+.trd{stroke:var(--muted); stroke-width:1.4; fill:none; stroke-dasharray:5 4}
+.tlab{fill:var(--ink); font-family:var(--f-mono); font-size:11.5px}
+.tlab2{fill:var(--accent); font-family:var(--f-mono); font-size:11px}
+.ahd{fill:var(--ink)} .ahm{fill:var(--muted)}
+.states{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px}
+.st-card{border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--paper); display:grid; gap:6px; border-top:4px solid var(--c); align-content:start}
+.st-card h3{font-size:1.15rem; display:flex; gap:8px; align-items:baseline; color:var(--c)}
+.st-card h3 small{font-family:var(--f-mono); font-size:.72rem; color:var(--muted); font-weight:400}
+.st-card p{margin:0; font-size:.95rem}
+.st-card dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:3px 10px; font-size:.9rem}
+.st-card dt{font-family:var(--f-mono); font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; padding-top:2px}
+.st-card dd{margin:0}
+.reset-note{margin:0; font-size:.93rem; background:var(--paper); border-left:3px solid var(--accent); padding:8px 12px; border-radius:0 6px 6px 0}
+.sumtab{overflow-x:auto; border:1px solid var(--line); border-radius:10px}
+.sumtab table{border-collapse:collapse; width:100%; font-size:.9rem}
+.sumtab th,.sumtab td{padding:6px 10px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap}
+.sumtab th{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--paper)}
+.sumtab tr:last-child td{border-bottom:none}
+.sumtab td{font-family:var(--f-mono)}
+.top{font-family:var(--f-mono); font-size:.8rem; color:var(--muted); justify-self:end; text-decoration:none}
+.top:hover{color:var(--accent)}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Transmitter Timing and Control · código explicado</div>
+  <h1>uart_tx_ctrl.sv explicado</h1>
+  <p>Tu módulo en SystemVerilog dividido en 15 segmentos, en el mismo orden del archivo. A la izquierda va el código con sus números de línea reales y a la derecha qué hace, en palabras sencillas.</p>
+  <div class="groups" aria-label="Grupos">
+    <span><b>01–04</b> declaraciones</span>
+    <span><a href="#fsm" style="color:inherit"><b>FSM</b> diagrama y estados</a></span>
+    <span><b>05–07</b> (d) FSM</span>
+    <span><b>08–10</b> señales de control</span>
+    <span><b>11–13</b> (a) TSR · (b) ticks · (c) bits</span>
+    <span><b>14–15</b> configuración y salida</span>
+  </div>
+  <nav class="map" aria-label="Segmentos"><a href="#s1"><b>01</b> Cabecera y puertos</a><a href="#s2"><b>02</b> Registros internos y foto de configuración</a><a href="#s3"><b>03</b> Cables internos (señales de control)</a><a href="#s4"><b>04</b> Los 5 estados de la FSM</a><a href="#s5"><b>05</b> Registro de estado</a><a href="#s6"><b>06</b> Lógica de estado futuro</a><a href="#s7"><b>07</b> Salidas de cada estado</a><a href="#s8"><b>08</b> Sincronizador de CTS</a><a href="#s9"><b>09</b> Condiciones de control</a><a href="#s10"><b>10</b> Cálculo de paridad</a><a href="#s11"><b>11</b> (a) TSR: registro de desplazamiento</a><a href="#s12"><b>12</b> (b) Contador de ticks</a><a href="#s13"><b>13</b> (c) Contador de bits</a><a href="#s14"><b>14</b> Foto de configuración</a><a href="#s15"><b>15</b> Salida: qué va al cable</a></nav>
+</header>
+
+
+<section class="seg" id="s1">
+  <div class="seg-head">
+    <span class="num">01</span>
+    <div class="ttl"><h2>Cabecera y puertos</h2><span class="meta"><span class="tag">interfaz</span> líneas 1–25</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">  1</span>  <span class="src">`timescale 1ns / 1ps</span>
+<span class="ln">  2</span>  <span class="src"></span>
+<span class="ln">  3</span>  <span class="src">module uart_tx_ctrl (</span>
+<span class="ln">  4</span>  <span class="src">    input  logic       clk,</span>
+<span class="ln">  5</span>  <span class="src">    input  logic       rst,</span>
+<span class="ln">  6</span>  <span class="src">    input  logic       bclk_tick,</span>
+<span class="ln">  7</span>  <span class="src">    input  logic       osm_sel,</span>
+<span class="ln">  8</span>  <span class="src">    input  logic [7:0] tx_data,</span>
+<span class="ln">  9</span>  <span class="src">    input  logic       tx_empty,</span>
+<span class="ln"> 10</span>  <span class="src">    input  logic [1:0] wls,</span>
+<span class="ln"> 11</span>  <span class="src">    input  logic       pen,</span>
+<span class="ln"> 12</span>  <span class="src">    input  logic       eps,</span>
+<span class="ln"> 13</span>  <span class="src">    input  logic       sp,</span>
+<span class="ln"> 14</span>  <span class="src">    input  logic       stb,</span>
+<span class="ln"> 15</span>  <span class="src">    input  logic       bc,</span>
+<span class="ln"> 16</span>  <span class="src">    input  logic       utrst,</span>
+<span class="ln"> 17</span>  <span class="src">    input  logic       cts_n,</span>
+<span class="ln"> 18</span>  <span class="src">    input  logic       afe,</span>
+<span class="ln"> 19</span>  <span class="src">    input  logic       loop,</span>
+<span class="ln"> 20</span>  <span class="src">    output logic       txd,</span>
+<span class="ln"> 21</span>  <span class="src">    output logic       tx_pop,</span>
+<span class="ln"> 22</span>  <span class="src">    output logic       tsr_empty,</span>
+<span class="ln"> 23</span>  <span class="src">    output logic       tx_serial_loop,</span>
+<span class="ln"> 24</span>  <span class="src">    output logic       tx_busy</span>
+<span class="ln"> 25</span>  <span class="src">);</span></pre></div>
+    <div class="exp">
+      <p class="sum">Le dice al simulador la unidad de tiempo y define la caja: cómo se llama el módulo y cuáles son sus 16 entradas y 5 salidas.</p>
+      <ul class="pts"><li><code>`timescale 1ns / 1ps</code><span>Unidad de tiempo para simular: los retardos se miden en nanosegundos, con precisión de picosegundos. No afecta al circuito.</span></li><li><code>module uart_tx_ctrl (</code><span>El nombre del módulo. Tus compañeros lo usarán con este nombre para conectarlo.</span></li><li><code>input logic ...</code><span>Las 16 entradas. <code>logic</code> es el tipo de SystemVerilog que sirve para todo (reemplaza a <code>reg</code> y <code>wire</code>). <code>[7:0]</code> significa 8 bits; <code>[1:0]</code>, 2 bits.</span></li><li><code>output logic ...</code><span>Las 5 salidas: <code>txd</code> (el cable), <code>tx_pop</code>, <code>tsr_empty</code>, <code>tx_serial_loop</code> y <code>tx_busy</code>.</span></li></ul>
+      <p class="q">¿Por qué tx_data tiene [7:0]? Porque la letra entra completa, los 8 bits a la vez (en paralelo).</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s2">
+  <div class="seg-head">
+    <span class="num">02</span>
+    <div class="ttl"><h2>Registros internos y foto de configuración</h2><span class="meta"><span class="tag">a · b · c</span> líneas 27–35</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln"> 27</span>  <span class="src">  logic [7:0] TSR;</span>
+<span class="ln"> 28</span>  <span class="src">  logic [5:0] CUENTA_TICK;</span>
+<span class="ln"> 29</span>  <span class="src">  logic [2:0] CUENTA_BIT;</span>
+<span class="ln"> 30</span>  <span class="src"></span>
+<span class="ln"> 31</span>  <span class="src">  logic [2:0] ULTIMO_BIT;</span>
+<span class="ln"> 32</span>  <span class="src">  logic       CON_PARIDAD;</span>
+<span class="ln"> 33</span>  <span class="src">  logic       BIT_PARIDAD;</span>
+<span class="ln"> 34</span>  <span class="src">  logic [5:0] FIN_BIT_N;</span>
+<span class="ln"> 35</span>  <span class="src">  logic [5:0] FIN_STOP_N;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Declara las memorias internas: las tres piezas principales y la “foto” donde se guarda la configuración de la letra que se está enviando.</p>
+      <ul class="pts"><li><code>TSR [7:0]</code><span><b>(a)</b> El registro de desplazamiento: guarda la letra que está saliendo.</span></li><li><code>CUENTA_TICK [5:0]</code><span><b>(b)</b> Cuenta los ticks dentro de cada bit. 6 bits porque debe llegar hasta 31 (el stop de 2 bits).</span></li><li><code>CUENTA_BIT [2:0]</code><span><b>(c)</b> Dice qué bit de datos va saliendo (0 a 7). 3 bits alcanzan para contar hasta 7.</span></li><li><code>ULTIMO_BIT, CON_PARIDAD, BIT_PARIDAD, FIN_BIT_N, FIN_STOP_N</code><span>La <b>foto</b>: cuántos bits tiene la letra, si lleva paridad, cuál es el bit de paridad y cuántos ticks dura un bit y el stop. Se copian una sola vez, al tomar la letra.</span></li></ul>
+      <p class="q">¿Por qué guardar una foto y no usar wls, pen, etc. directamente? Porque la CPU podría cambiar la configuración a mitad del envío y la letra saldría dañada.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s3">
+  <div class="seg-head">
+    <span class="num">03</span>
+    <div class="ttl"><h2>Cables internos (señales de control)</h2><span class="meta"><span class="tag">control</span> líneas 37–48</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln"> 37</span>  <span class="src">  logic CTS_A, CTS_B;</span>
+<span class="ln"> 38</span>  <span class="src"></span>
+<span class="ln"> 39</span>  <span class="src">  logic       FIN_BIT;</span>
+<span class="ln"> 40</span>  <span class="src">  logic       ULTIMO;</span>
+<span class="ln"> 41</span>  <span class="src">  logic       HAY_DATO;</span>
+<span class="ln"> 42</span>  <span class="src">  logic       CARGA;</span>
+<span class="ln"> 43</span>  <span class="src">  logic       DESPLAZA;</span>
+<span class="ln"> 44</span>  <span class="src">  logic [7:0] MASCARA;</span>
+<span class="ln"> 45</span>  <span class="src">  logic       PARIDAD_CALC;</span>
+<span class="ln"> 46</span>  <span class="src">  logic [1:0] SEL;</span>
+<span class="ln"> 47</span>  <span class="src">  logic       OCUPADO;</span>
+<span class="ln"> 48</span>  <span class="src">  logic       LINEA;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Declara las señales que conectan las piezas entre sí. Son los “avisos” que se pasan unas a otras.</p>
+      <ul class="pts"><li><code>CTS_A, CTS_B</code><span>Los dos flip-flops del sincronizador de CTS.</span></li><li><code>FIN_BIT</code><span>(b) avisa: “este bit ya duró lo que tenía que durar”.</span></li><li><code>ULTIMO</code><span>(c) avisa: “este es el último bit de datos”.</span></li><li><code>HAY_DATO</code><span>Hay una letra en la fila y CTS deja enviar.</span></li><li><code>CARGA / DESPLAZA</code><span>Órdenes para el TSR: cargar una letra nueva o correrse una posición.</span></li><li><code>MASCARA, PARIDAD_CALC</code><span>Ayudan a calcular la paridad.</span></li><li><code>SEL, OCUPADO, LINEA</code><span>Salidas de la FSM: qué poner en el cable, si está ocupado, y el valor final de la línea.</span></li></ul>
+      <p class="q">Aquí solo se declaran; lo que hace cada una se define más abajo con assign o always.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s4">
+  <div class="seg-head">
+    <span class="num">04</span>
+    <div class="ttl"><h2>Los 5 estados de la FSM</h2><span class="meta"><span class="tag">d · FSM</span> líneas 50–58</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln"> 50</span>  <span class="src">  typedef enum logic [2:0] {</span>
+<span class="ln"> 51</span>  <span class="src">    IDLE    = 3&#x27;b000,</span>
+<span class="ln"> 52</span>  <span class="src">    START   = 3&#x27;b001,</span>
+<span class="ln"> 53</span>  <span class="src">    DATOS   = 3&#x27;b010,</span>
+<span class="ln"> 54</span>  <span class="src">    PARIDAD = 3&#x27;b011,</span>
+<span class="ln"> 55</span>  <span class="src">    STOP    = 3&#x27;b100</span>
+<span class="ln"> 56</span>  <span class="src">  } estado_t;</span>
+<span class="ln"> 57</span>  <span class="src"></span>
+<span class="ln"> 58</span>  <span class="src">  estado_t presente, futuro;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Crea un tipo nuevo llamado estado_t con los 5 estados y dos variables de ese tipo: el estado presente y el futuro.</p>
+      <ul class="pts"><li><code>typedef enum logic [2:0]</code><span>Un <code>enum</code> le pone nombre a cada número. Con 3 bits caben hasta 8 estados; usamos 5.</span></li><li><code>IDLE = 000 … STOP = 100</code><span>Reposo, start, datos, paridad y stop, cada uno con su código binario.</span></li><li><code>estado_t presente, futuro;</code><span><code>presente</code> es el estado actual (un registro). <code>futuro</code> es el que toca en el siguiente ciclo (lógica combinacional).</span></li></ul>
+      <p class="q">Ventaja del enum: en las ondas de GTKWave se ven los nombres (IDLE, START…) en vez de 0, 1, 2…</p>
+    </div>
+  </div>
+</section>
+<section class="fsm" id="fsm">
+  <div class="seg-head"><span class="num">FSM</span><div class="ttl"><h2>La máquina de estados</h2><span class="meta"><span class="tag">d · FSM</span> segmentos 04–07</span></div></div>
+  <p class="lead">La FSM es el “cerebro” del módulo: decide en qué parte de la letra vamos. Tiene 5 estados. Cada flecha lleva la condición exacta del código y, en naranja, lo que pasa al tomarla. Las flechas curvas indican que el estado se queda igual mientras no se cumpla ninguna condición de salida.</p>
+  <div class="fsmdiag"><svg viewBox="0 0 1000 560" role="img" aria-label="Diagrama de estados de la FSM">
+  <defs>
+    <marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ahd" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="fm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahm" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <path class="trd" d="M14,250 L42,250" marker-end="url(#fm)"/>
+  <text class="tlab2" x="8" y="320">rst || !utrst</text>
+  <text class="tlab2" x="8" y="334">desde cualquier estado</text>
+
+  <path class="tr" d="M215,225 L345,135" marker-end="url(#fa)"/>
+  <text class="tlab" x="150" y="152">bclk_tick &amp;&amp; HAY_DATO</text>
+  <text class="tlab2" x="185" y="168">CARGA → tx_pop</text>
+
+  <path class="tr" d="M515,110 L735,210" marker-end="url(#fa)"/>
+  <text class="tlab" x="640" y="145">FIN_BIT</text>
+
+  <path class="tr" d="M820,288 L820,402" marker-end="url(#fa)"/>
+  <text class="tlab" x="830" y="335">FIN_BIT &amp;&amp; ULTIMO</text>
+  <text class="tlab" x="830" y="351">&amp;&amp; CON_PARIDAD</text>
+
+  <path class="tr" d="M745,282 L522,412" marker-end="url(#fa)"/>
+  <text class="tlab" x="630" y="384">FIN_BIT &amp;&amp; ULTIMO</text>
+  <text class="tlab" x="630" y="400">&amp;&amp; !CON_PARIDAD</text>
+
+  <path class="tr" d="M735,440 L520,440" marker-end="url(#fa)"/>
+  <text class="tlab" x="600" y="432">FIN_BIT</text>
+
+  <path class="tr" d="M455,402 L455,128" marker-end="url(#fa)"/>
+  <text class="tlab" x="290" y="250">FIN_BIT &amp;&amp; HAY_DATO</text>
+  <text class="tlab2" x="290" y="266">CARGA → tx_pop</text>
+  <text class="tlab2" x="290" y="282">otra letra, sin pausa</text>
+
+  <path class="tr" d="M345,425 L170,288" marker-end="url(#fa)"/>
+  <text class="tlab" x="110" y="400">FIN_BIT &amp;&amp; !HAY_DATO</text>
+
+  <path class="tr" d="M100,214 C70,150 200,150 170,214" marker-end="url(#fa)"/>
+  <text class="tlab" x="6" y="186">sin dato</text>
+  <path class="tr" d="M410,54 C390,4 490,4 470,54" marker-end="url(#fa)"/>
+  <text class="tlab" x="500" y="22">!FIN_BIT</text>
+  <path class="tr" d="M895,232 C975,200 975,290 895,270" marker-end="url(#fa)"/>
+  <text class="tlab" x="905" y="182">!(FIN_BIT</text>
+  <text class="tlab" x="905" y="196">&amp;&amp; ULTIMO)</text>
+  <text class="tlab2" x="905" y="212">DESPLAZA</text>
+  <path class="tr" d="M895,422 C975,390 975,480 895,460" marker-end="url(#fa)"/>
+  <text class="tlab" x="905" y="508">!FIN_BIT</text>
+  <path class="tr" d="M410,476 C390,540 490,540 470,476" marker-end="url(#fa)"/>
+  <text class="tlab" x="500" y="540">!FIN_BIT</text>
+
+  <rect class="sbox s-IDLE" x="45" y="212" width="170" height="76" rx="38"/>
+  <text class="sname n-IDLE" x="130" y="244" text-anchor="middle">IDLE</text>
+  <text class="ssub" x="130" y="262" text-anchor="middle">3'b000</text>
+  <text class="ssub" x="130" y="277" text-anchor="middle">línea = 1</text>
+  <rect class="sbox s-START" x="345" y="52" width="170" height="76" rx="38"/>
+  <text class="sname n-START" x="430" y="84" text-anchor="middle">START</text>
+  <text class="ssub" x="430" y="102" text-anchor="middle">3'b001</text>
+  <text class="ssub" x="430" y="117" text-anchor="middle">línea = 0</text>
+  <rect class="sbox s-DATOS" x="735" y="212" width="170" height="76" rx="38"/>
+  <text class="sname n-DATOS" x="820" y="244" text-anchor="middle">DATOS</text>
+  <text class="ssub" x="820" y="262" text-anchor="middle">3'b010</text>
+  <text class="ssub" x="820" y="277" text-anchor="middle">línea = TSR[0]</text>
+  <rect class="sbox s-PARIDAD" x="735" y="402" width="170" height="76" rx="38"/>
+  <text class="sname n-PARIDAD" x="820" y="434" text-anchor="middle">PARIDAD</text>
+  <text class="ssub" x="820" y="452" text-anchor="middle">3'b011</text>
+  <text class="ssub" x="820" y="467" text-anchor="middle">línea = BIT_PARIDAD</text>
+  <rect class="sbox s-STOP" x="345" y="402" width="170" height="76" rx="38"/>
+  <text class="sname n-STOP" x="430" y="434" text-anchor="middle">STOP</text>
+  <text class="ssub" x="430" y="452" text-anchor="middle">3'b100</text>
+  <text class="ssub" x="430" y="467" text-anchor="middle">línea = 1</text>
+</svg></div>
+  <p class="reset-note"><b>Reset:</b> desde cualquier estado, si <code>rst = 1</code> o <code>utrst = 0</code>, la FSM vuelve a IDLE en el siguiente flanco de reloj (segmento 05).</p>
+  <div class="states"><div class="st-card" style="--c:var(--c-idle)"><h3>IDLE <small>3'b000</small></h3><p><b>Reposo.</b> “Idle” en inglés significa “inactivo” u “ocioso”. Es el estado en el que el transmisor no está enviando nada y espera a que haya una letra en la fila. Es el estado inicial y al que vuelve tras un reset.</p><dl><dt>Cable</dt><dd>1 (la línea en reposo siempre está en 1)</dd><dt>Dura</dt><dd>Lo que haga falta: hasta que llegue una letra</dd><dt>Salidas</dt><dd>SEL = 11, OCUPADO = 0 → tsr_empty = 1, tx_busy = 0</dd><dt>Sale a</dt><dd>START, cuando llega un tick y HAY_DATO = 1. En ese momento CARGA = 1: se carga el TSR y se manda tx_pop</dd></dl></div><div class="st-card" style="--c:var(--c-start)"><h3>START <small>3'b001</small></h3><p><b>Bit de inicio.</b> Baja el cable a 0 para avisarle al receptor “ahí va una letra”. El receptor detecta ese paso de 1 a 0 y empieza a contar el tiempo desde ahí.</p><dl><dt>Cable</dt><dd>0</dd><dt>Dura</dt><dd>1 bit: 16 ticks (13 con osm_sel = 1)</dd><dt>Salidas</dt><dd>SEL = 00, OCUPADO = 1</dd><dt>Sale a</dt><dd>DATOS, cuando FIN_BIT = 1</dd></dl></div><div class="st-card" style="--c:var(--c-data)"><h3>DATOS <small>3'b010</small></h3><p><b>Envío de los bits de la letra.</b> Pone en el cable TSR[0]. Cada vez que termina un bit, DESPLAZA corre el TSR y CUENTA_BIT sube, así sale el siguiente bit.</p><dl><dt>Cable</dt><dd>TSR[0]: D0, D1, … (LSB primero)</dd><dt>Dura</dt><dd>5 a 8 bits × 16 ticks, según wls</dd><dt>Salidas</dt><dd>SEL = 01, OCUPADO = 1</dd><dt>Sale a</dt><dd>Cuando FIN_BIT y ULTIMO: a PARIDAD si CON_PARIDAD = 1, si no a STOP</dd></dl></div><div class="st-card" style="--c:var(--c-par)"><h3>PARIDAD <small>3'b011</small></h3><p><b>Bit de paridad.</b> Envía el bit que se calculó al cargar la letra, para que el receptor pueda detectar errores. Solo se pasa por aquí si la paridad está activada (pen = 1).</p><dl><dt>Cable</dt><dd>BIT_PARIDAD</dd><dt>Dura</dt><dd>1 bit: 16 ticks</dd><dt>Salidas</dt><dd>SEL = 10, OCUPADO = 1</dd><dt>Sale a</dt><dd>STOP, cuando FIN_BIT = 1</dd></dl></div><div class="st-card" style="--c:var(--c-stop)"><h3>STOP <small>3'b100</small></h3><p><b>Bit(s) de parada.</b> Sube el cable a 1 para marcar el final de la letra y dar tiempo al receptor antes de la siguiente.</p><dl><dt>Cable</dt><dd>1</dd><dt>Dura</dt><dd>1, 1.5 ó 2 bits: 16/24/32 ticks (13/19/26 con 13×)</dd><dt>Salidas</dt><dd>SEL = 11, OCUPADO = 1</dd><dt>Sale a</dt><dd>Al terminar (FIN_BIT): START directo si HAY_DATO (carga otra letra), si no IDLE</dd></dl></div></div>
+  <div class="sumtab"><table>
+    <thead><tr><th>Estado</th><th>Código</th><th>SEL</th><th>Cable (txd)</th><th>OCUPADO</th><th>Duración</th></tr></thead>
+    <tbody>
+      <tr><td>IDLE</td><td>3'b000</td><td>11</td><td>1</td><td>0</td><td>indefinida</td></tr>
+      <tr><td>START</td><td>3'b001</td><td>00</td><td>0</td><td>1</td><td>1 bit</td></tr>
+      <tr><td>DATOS</td><td>3'b010</td><td>01</td><td>TSR[0]</td><td>1</td><td>5–8 bits</td></tr>
+      <tr><td>PARIDAD</td><td>3'b011</td><td>10</td><td>BIT_PARIDAD</td><td>1</td><td>1 bit (opcional)</td></tr>
+      <tr><td>STOP</td><td>3'b100</td><td>11</td><td>1</td><td>1</td><td>1, 1.5 ó 2 bits</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="seg" id="s5">
+  <div class="seg-head">
+    <span class="num">05</span>
+    <div class="ttl"><h2>Registro de estado</h2><span class="meta"><span class="tag">d · FSM</span> líneas 60–64</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln"> 60</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln"> 61</span>  <span class="src">    if (rst || !utrst)</span>
+<span class="ln"> 62</span>  <span class="src">      presente &lt;= IDLE;</span>
+<span class="ln"> 63</span>  <span class="src">    else</span>
+<span class="ln"> 64</span>  <span class="src">      presente &lt;= futuro;</span></pre></div>
+    <div class="exp">
+      <p class="sum">En cada flanco de reloj, la FSM pasa al estado futuro. Si hay reset (o el TX está apagado), vuelve a reposo.</p>
+      <ul class="pts"><li><code>always_ff @(posedge clk)</code><span>Bloque de flip-flops: se ejecuta en cada flanco de subida del reloj.</span></li><li><code>if (rst || !utrst) presente &lt;= IDLE;</code><span>Reset general o <code>utrst = 0</code> → a reposo.</span></li><li><code>else presente &lt;= futuro;</code><span>Si no, avanza al estado que calculó la lógica de estado futuro.</span></li></ul>
+      <p class="q">Se usa <= (no bloqueante) porque es un registro: todos los flip-flops cambian a la vez en el flanco.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s6">
+  <div class="seg-head">
+    <span class="num">06</span>
+    <div class="ttl"><h2>Lógica de estado futuro</h2><span class="meta"><span class="tag">d · FSM</span> líneas 66–103</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln"> 66</span>  <span class="src">  always_comb begin</span>
+<span class="ln"> 67</span>  <span class="src">    case (presente)</span>
+<span class="ln"> 68</span>  <span class="src">      IDLE:</span>
+<span class="ln"> 69</span>  <span class="src">        if (bclk_tick &amp;&amp; HAY_DATO)</span>
+<span class="ln"> 70</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 71</span>  <span class="src">        else</span>
+<span class="ln"> 72</span>  <span class="src">          futuro = IDLE;</span>
+<span class="ln"> 73</span>  <span class="src"></span>
+<span class="ln"> 74</span>  <span class="src">      START:</span>
+<span class="ln"> 75</span>  <span class="src">        if (FIN_BIT)</span>
+<span class="ln"> 76</span>  <span class="src">          futuro = DATOS;</span>
+<span class="ln"> 77</span>  <span class="src">        else</span>
+<span class="ln"> 78</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 79</span>  <span class="src"></span>
+<span class="ln"> 80</span>  <span class="src">      DATOS:</span>
+<span class="ln"> 81</span>  <span class="src">        if (FIN_BIT &amp;&amp; ULTIMO)</span>
+<span class="ln"> 82</span>  <span class="src">          futuro = CON_PARIDAD ? PARIDAD : STOP;</span>
+<span class="ln"> 83</span>  <span class="src">        else</span>
+<span class="ln"> 84</span>  <span class="src">          futuro = DATOS;</span>
+<span class="ln"> 85</span>  <span class="src"></span>
+<span class="ln"> 86</span>  <span class="src">      PARIDAD:</span>
+<span class="ln"> 87</span>  <span class="src">        if (FIN_BIT)</span>
+<span class="ln"> 88</span>  <span class="src">          futuro = STOP;</span>
+<span class="ln"> 89</span>  <span class="src">        else</span>
+<span class="ln"> 90</span>  <span class="src">          futuro = PARIDAD;</span>
+<span class="ln"> 91</span>  <span class="src"></span>
+<span class="ln"> 92</span>  <span class="src">      STOP:</span>
+<span class="ln"> 93</span>  <span class="src">        if (FIN_BIT &amp;&amp; HAY_DATO)</span>
+<span class="ln"> 94</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 95</span>  <span class="src">        else if (FIN_BIT)</span>
+<span class="ln"> 96</span>  <span class="src">          futuro = IDLE;</span>
+<span class="ln"> 97</span>  <span class="src">        else</span>
+<span class="ln"> 98</span>  <span class="src">          futuro = STOP;</span>
+<span class="ln"> 99</span>  <span class="src"></span>
+<span class="ln">100</span>  <span class="src">      default:</span>
+<span class="ln">101</span>  <span class="src">        futuro = IDLE;</span>
+<span class="ln">102</span>  <span class="src">    endcase</span>
+<span class="ln">103</span>  <span class="src">  end</span></pre></div>
+    <div class="exp">
+      <p class="sum">Decide a qué estado ir según el estado actual y los avisos FIN_BIT, ULTIMO y HAY_DATO. Es el “cerebro” del módulo.</p>
+      <ul class="pts"><li><code>IDLE</code><span>Si llega un tick y hay dato → START. Si no, se queda en IDLE.</span></li><li><code>START</code><span>Cuando termina el bit (FIN_BIT) → DATOS.</span></li><li><code>DATOS</code><span>Cuando termina el último bit → PARIDAD si hay paridad, si no → STOP. Mientras no sea el último, se queda en DATOS (el TSR se va desplazando).</span></li><li><code>PARIDAD</code><span>Cuando termina el bit → STOP.</span></li><li><code>STOP</code><span>Al terminar: si hay otra letra → START directo (sin pausa); si no → IDLE.</span></li><li><code>default</code><span>Por seguridad: si por algún motivo el estado fuera inválido, vuelve a IDLE.</span></li></ul>
+      <p class="q">always_comb usa = (bloqueante) porque es lógica combinacional: no guarda nada, solo calcula.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s7">
+  <div class="seg-head">
+    <span class="num">07</span>
+    <div class="ttl"><h2>Salidas de cada estado</h2><span class="meta"><span class="tag">d · FSM</span> líneas 105–132</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">105</span>  <span class="src">  always_comb begin</span>
+<span class="ln">106</span>  <span class="src">    case (presente)</span>
+<span class="ln">107</span>  <span class="src">      IDLE: begin</span>
+<span class="ln">108</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">109</span>  <span class="src">        OCUPADO = 1&#x27;b0;</span>
+<span class="ln">110</span>  <span class="src">      end</span>
+<span class="ln">111</span>  <span class="src">      START: begin</span>
+<span class="ln">112</span>  <span class="src">        SEL     = 2&#x27;b00;</span>
+<span class="ln">113</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">114</span>  <span class="src">      end</span>
+<span class="ln">115</span>  <span class="src">      DATOS: begin</span>
+<span class="ln">116</span>  <span class="src">        SEL     = 2&#x27;b01;</span>
+<span class="ln">117</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">118</span>  <span class="src">      end</span>
+<span class="ln">119</span>  <span class="src">      PARIDAD: begin</span>
+<span class="ln">120</span>  <span class="src">        SEL     = 2&#x27;b10;</span>
+<span class="ln">121</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">122</span>  <span class="src">      end</span>
+<span class="ln">123</span>  <span class="src">      STOP: begin</span>
+<span class="ln">124</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">125</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">126</span>  <span class="src">      end</span>
+<span class="ln">127</span>  <span class="src">      default: begin</span>
+<span class="ln">128</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">129</span>  <span class="src">        OCUPADO = 1&#x27;b0;</span>
+<span class="ln">130</span>  <span class="src">      end</span>
+<span class="ln">131</span>  <span class="src">    endcase</span>
+<span class="ln">132</span>  <span class="src">  end</span></pre></div>
+    <div class="exp">
+      <p class="sum">Según el estado, elige qué va en el cable (SEL) y si el transmisor está ocupado (OCUPADO).</p>
+      <ul class="pts"><li><code>SEL = 00 en START</code><span>El cable va a 0 (el bit de start).</span></li><li><code>SEL = 01 en DATOS</code><span>El cable toma el bit TSR[0].</span></li><li><code>SEL = 10 en PARIDAD</code><span>El cable toma el bit de paridad.</span></li><li><code>SEL = 11 en IDLE y STOP</code><span>El cable va a 1.</span></li><li><code>OCUPADO</code><span>0 solo en IDLE; 1 en todos los demás estados (está enviando).</span></li></ul>
+      <p class="q">Es una FSM tipo Moore: estas salidas dependen solo del estado presente.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s8">
+  <div class="seg-head">
+    <span class="num">08</span>
+    <div class="ttl"><h2>Sincronizador de CTS</h2><span class="meta"><span class="tag">control</span> líneas 134–141</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">134</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">135</span>  <span class="src">    if (rst) begin</span>
+<span class="ln">136</span>  <span class="src">      CTS_A &lt;= 1&#x27;b1;</span>
+<span class="ln">137</span>  <span class="src">      CTS_B &lt;= 1&#x27;b1;</span>
+<span class="ln">138</span>  <span class="src">    end else begin</span>
+<span class="ln">139</span>  <span class="src">      CTS_A &lt;= cts_n;</span>
+<span class="ln">140</span>  <span class="src">      CTS_B &lt;= CTS_A;</span>
+<span class="ln">141</span>  <span class="src">    end</span></pre></div>
+    <div class="exp">
+      <p class="sum">cts_n viene de un pin externo que no va al ritmo del reloj. Pasa por dos flip-flops en fila para “limpiarla” antes de usarla.</p>
+      <ul class="pts"><li><code>CTS_A &lt;= cts_n;</code><span>Primer flip-flop: puede quedar un instante inestable (metaestabilidad).</span></li><li><code>CTS_B &lt;= CTS_A;</code><span>Segundo flip-flop: ya sale una señal estable. El resto del módulo usa CTS_B.</span></li><li><code>reset → 1</code><span>Tras un reset arranca en 1 (“esperar”) por seguridad.</span></li></ul>
+      <p class="q">Costo: CTS se ve con 2 ciclos de retraso, que no importa frente a los cientos de ciclos que dura un bit.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s9">
+  <div class="seg-head">
+    <span class="num">09</span>
+    <div class="ttl"><h2>Condiciones de control</h2><span class="meta"><span class="tag">control</span> líneas 143–148</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">143</span>  <span class="src">  assign HAY_DATO = !tx_empty &amp;&amp; !(afe &amp;&amp; CTS_B);</span>
+<span class="ln">144</span>  <span class="src">  assign FIN_BIT  = bclk_tick &amp;&amp; (CUENTA_TICK == ((presente == STOP) ? FIN_STOP_N : FIN_BIT_N));</span>
+<span class="ln">145</span>  <span class="src">  assign ULTIMO   = (CUENTA_BIT == ULTIMO_BIT);</span>
+<span class="ln">146</span>  <span class="src">  assign CARGA    = !rst &amp;&amp; utrst &amp;&amp; bclk_tick &amp;&amp; HAY_DATO &amp;&amp;</span>
+<span class="ln">147</span>  <span class="src">                    ((presente == IDLE) || (presente == STOP &amp;&amp; FIN_BIT));</span>
+<span class="ln">148</span>  <span class="src">  assign DESPLAZA = (presente == DATOS) &amp;&amp; FIN_BIT;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Cinco ecuaciones que generan los avisos y órdenes que usan la FSM y las piezas.</p>
+      <ul class="pts"><li><code>HAY_DATO</code><span>La fila no está vacía <b>y</b> no es cierto que (afe esté activo y CTS diga esperar).</span></li><li><code>FIN_BIT</code><span>Llegó un tick <b>y</b> el contador ya está en el último valor (el de stop si estamos en STOP, el normal si no).</span></li><li><code>ULTIMO</code><span>El contador de bits es igual al último bit guardado en la foto.</span></li><li><code>CARGA</code><span>No hay reset, el TX está encendido, hay tick, hay dato, y el TSR está libre (en IDLE o justo terminando el stop). También sale como tx_pop.</span></li><li><code>DESPLAZA</code><span>Estamos en DATOS y terminó un bit.</span></li></ul>
+      <p class="q">CARGA depende del estado y además de entradas (tick, dato): por eso va en un assign y no en el case de salidas.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s10">
+  <div class="seg-head">
+    <span class="num">10</span>
+    <div class="ttl"><h2>Cálculo de paridad</h2><span class="meta"><span class="tag">paridad</span> líneas 150–151</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">150</span>  <span class="src">  assign MASCARA      = 8&#x27;hFF &gt;&gt; (2&#x27;d3 - wls);</span>
+<span class="ln">151</span>  <span class="src">  assign PARIDAD_CALC = ^(tx_data &amp; MASCARA);</span></pre></div>
+    <div class="exp">
+      <p class="sum">Cuenta si la letra tiene un número par o impar de unos, usando solo los bits que realmente se envían.</p>
+      <ul class="pts"><li><code>MASCARA = 8&#x27;hFF &gt;&gt; (3 - wls)</code><span>Deja en 1 solo los bits usados: 5 bits → 0001_1111, 8 bits → 1111_1111.</span></li><li><code>PARIDAD_CALC = ^(tx_data &amp; MASCARA)</code><span>El operador ^ delante hace XOR de todos los bits: da 1 si hay un número impar de unos y 0 si es par.</span></li></ul>
+      <p class="q">Para la “A” (0100_0001) hay dos unos → PARIDAD_CALC = 0.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s11">
+  <div class="seg-head">
+    <span class="num">11</span>
+    <div class="ttl"><h2>(a) TSR: registro de desplazamiento</h2><span class="meta"><span class="tag">a · TSR</span> líneas 153–159</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">153</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">154</span>  <span class="src">    if (rst || !utrst)</span>
+<span class="ln">155</span>  <span class="src">      TSR &lt;= 8&#x27;hFF;</span>
+<span class="ln">156</span>  <span class="src">    else if (CARGA)</span>
+<span class="ln">157</span>  <span class="src">      TSR &lt;= tx_data;</span>
+<span class="ln">158</span>  <span class="src">    else if (DESPLAZA)</span>
+<span class="ln">159</span>  <span class="src">      TSR &lt;= {1&#x27;b1, TSR[7:1]};</span></pre></div>
+    <div class="exp">
+      <p class="sum">Guarda la letra y la va corriendo hacia la derecha, un bit por cada bit de datos que sale.</p>
+      <ul class="pts"><li><code>reset → 8&#x27;hFF</code><span>Tras un reset queda lleno de unos.</span></li><li><code>CARGA → TSR &lt;= tx_data</code><span>Copia la letra que viene del FIFO.</span></li><li><code>DESPLAZA → {1&#x27;b1, TSR[7:1]}</code><span>Corre todo una posición a la derecha y mete un 1 por la izquierda. El bit que estaba en TSR[1] pasa a TSR[0], que es el que sale por el cable.</span></li></ul>
+      <p class="q">Por eso sale primero el bit menos significativo: siempre se envía TSR[0].</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s12">
+  <div class="seg-head">
+    <span class="num">12</span>
+    <div class="ttl"><h2>(b) Contador de ticks</h2><span class="meta"><span class="tag">b · ticks</span> líneas 161–165</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">161</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">162</span>  <span class="src">    if (rst || !utrst || CARGA)</span>
+<span class="ln">163</span>  <span class="src">      CUENTA_TICK &lt;= 6&#x27;d0;</span>
+<span class="ln">164</span>  <span class="src">    else if (bclk_tick &amp;&amp; presente != IDLE)</span>
+<span class="ln">165</span>  <span class="src">      CUENTA_TICK &lt;= FIN_BIT ? 6&#x27;d0 : CUENTA_TICK + 6&#x27;d1;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Cuenta los pulsos bclk_tick para que cada bit dure exactamente 16 (o 13) ticks.</p>
+      <ul class="pts"><li><code>reset o CARGA → 0</code><span>Empieza desde 0 al tomar una letra nueva.</span></li><li><code>tick y no IDLE → +1</code><span>Con cada tick suma 1…</span></li><li><code>FIN_BIT → 0</code><span>…y cuando llega al final del bit vuelve a 0 para el siguiente.</span></li></ul>
+      <p class="q">En IDLE no cuenta: no hay bit que medir.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s13">
+  <div class="seg-head">
+    <span class="num">13</span>
+    <div class="ttl"><h2>(c) Contador de bits</h2><span class="meta"><span class="tag">c · bits</span> líneas 167–171</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">167</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">168</span>  <span class="src">    if (rst || !utrst || CARGA)</span>
+<span class="ln">169</span>  <span class="src">      CUENTA_BIT &lt;= 3&#x27;d0;</span>
+<span class="ln">170</span>  <span class="src">    else if (DESPLAZA)</span>
+<span class="ln">171</span>  <span class="src">      CUENTA_BIT &lt;= ULTIMO ? 3&#x27;d0 : CUENTA_BIT + 3&#x27;d1;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Lleva la cuenta de qué bit de datos está saliendo: D0, D1, … hasta el último.</p>
+      <ul class="pts"><li><code>reset o CARGA → 0</code><span>Empieza en D0 con cada letra.</span></li><li><code>DESPLAZA → +1</code><span>Cada vez que termina un bit de datos, avanza.</span></li><li><code>ULTIMO → 0</code><span>Después del último bit vuelve a 0.</span></li></ul>
+      <p class="q">Avanza al mismo tiempo que el TSR se desplaza: los dos usan DESPLAZA.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s14">
+  <div class="seg-head">
+    <span class="num">14</span>
+    <div class="ttl"><h2>Foto de configuración</h2><span class="meta"><span class="tag">config</span> líneas 173–188</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">173</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">174</span>  <span class="src">    if (rst || !utrst) begin</span>
+<span class="ln">175</span>  <span class="src">      ULTIMO_BIT  &lt;= 3&#x27;d7;</span>
+<span class="ln">176</span>  <span class="src">      CON_PARIDAD &lt;= 1&#x27;b0;</span>
+<span class="ln">177</span>  <span class="src">      BIT_PARIDAD &lt;= 1&#x27;b1;</span>
+<span class="ln">178</span>  <span class="src">      FIN_BIT_N   &lt;= 6&#x27;d15;</span>
+<span class="ln">179</span>  <span class="src">      FIN_STOP_N  &lt;= 6&#x27;d15;</span>
+<span class="ln">180</span>  <span class="src">    end else if (CARGA) begin</span>
+<span class="ln">181</span>  <span class="src">      ULTIMO_BIT  &lt;= {1&#x27;b1, wls};</span>
+<span class="ln">182</span>  <span class="src">      CON_PARIDAD &lt;= pen;</span>
+<span class="ln">183</span>  <span class="src">      BIT_PARIDAD &lt;= sp ? ~eps : (eps ? PARIDAD_CALC : ~PARIDAD_CALC);</span>
+<span class="ln">184</span>  <span class="src">      FIN_BIT_N   &lt;= osm_sel ? 6&#x27;d12 : 6&#x27;d15;</span>
+<span class="ln">185</span>  <span class="src">      FIN_STOP_N  &lt;= !stb           ? (osm_sel ? 6&#x27;d12 : 6&#x27;d15)</span>
+<span class="ln">186</span>  <span class="src">                   : (wls == 2&#x27;b00) ? (osm_sel ? 6&#x27;d18 : 6&#x27;d23)</span>
+<span class="ln">187</span>  <span class="src">                   :                  (osm_sel ? 6&#x27;d25 : 6&#x27;d31);</span>
+<span class="ln">188</span>  <span class="src">    end</span></pre></div>
+    <div class="exp">
+      <p class="sum">En el momento de CARGA copia la configuración del LCR. Esa copia se usa hasta terminar la letra.</p>
+      <ul class="pts"><li><code>ULTIMO_BIT &lt;= {1&#x27;b1, wls}</code><span>Es 4 + wls: 5 bits → último es D4; 8 bits → D7.</span></li><li><code>CON_PARIDAD &lt;= pen</code><span>Si esta letra lleva paridad.</span></li><li><code>BIT_PARIDAD</code><span>Si sp = 1: paridad fija (eps=0 → 1, eps=1 → 0). Si no: par → PARIDAD_CALC; impar → su negado.</span></li><li><code>FIN_BIT_N</code><span>15 con 16× (cuenta 0..15 = 16 ticks) o 12 con 13×.</span></li><li><code>FIN_STOP_N</code><span>1 stop → 15/12; 1.5 stop → 23/18; 2 stop → 31/25.</span></li></ul>
+      <p class="q">Se cuenta desde 0, por eso 16 ticks terminan en 15.</p>
+    </div>
+  </div>
+</section>
+<section class="seg" id="s15">
+  <div class="seg-head">
+    <span class="num">15</span>
+    <div class="ttl"><h2>Salida: qué va al cable</h2><span class="meta"><span class="tag">salida</span> líneas 190–203</span></div>
+  </div>
+  <div class="seg-body">
+    <div class="code"><pre><span class="ln">190</span>  <span class="src">  always_comb begin</span>
+<span class="ln">191</span>  <span class="src">    case (SEL)</span>
+<span class="ln">192</span>  <span class="src">      2&#x27;b00:   LINEA = 1&#x27;b0;</span>
+<span class="ln">193</span>  <span class="src">      2&#x27;b01:   LINEA = TSR[0];</span>
+<span class="ln">194</span>  <span class="src">      2&#x27;b10:   LINEA = BIT_PARIDAD;</span>
+<span class="ln">195</span>  <span class="src">      default: LINEA = 1&#x27;b1;</span>
+<span class="ln">196</span>  <span class="src">    endcase</span>
+<span class="ln">197</span>  <span class="src">  end</span>
+<span class="ln">198</span>  <span class="src"></span>
+<span class="ln">199</span>  <span class="src">  assign tx_serial_loop = LINEA &amp; ~bc;</span>
+<span class="ln">200</span>  <span class="src">  assign txd            = loop ? 1&#x27;b1 : tx_serial_loop;</span>
+<span class="ln">201</span>  <span class="src">  assign tx_pop         = CARGA;</span>
+<span class="ln">202</span>  <span class="src">  assign tsr_empty      = !OCUPADO;</span>
+<span class="ln">203</span>  <span class="src">  assign tx_busy        = OCUPADO;</span></pre></div>
+    <div class="exp">
+      <p class="sum">Convierte SEL en el valor de la línea y aplica break y loopback. Al final conecta las salidas del módulo.</p>
+      <ul class="pts"><li><code>case (SEL) → LINEA</code><span>00 → 0, 01 → TSR[0], 10 → bit de paridad, 11 → 1.</span></li><li><code>tx_serial_loop = LINEA &amp; ~bc</code><span>Si bc = 1 (break), fuerza 0.</span></li><li><code>txd = loop ? 1 : tx_serial_loop</code><span>En loopback el pin se queda en 1 y la señal solo va al receptor.</span></li><li><code>tx_pop = CARGA</code><span>Avisa al FIFO que ya tomó la letra.</span></li><li><code>tsr_empty = !OCUPADO, tx_busy = OCUPADO</code><span>Estado del transmisor para el LSR y la emulación.</span></li></ul>
+      <p class="q">txd es la salida más importante: es el cable por donde sale la letra.</p>
+    </div>
+  </div>
+</section>
+
+<section class="walk" id="recorrido">
+  <h2>Recorrido completo con la “A”</h2>
+  <p style="margin:0">Así se usan los segmentos, en orden, al enviar la “A” (8 bits, paridad par, 1 stop):</p>
+  <ol>
+    <li>En reposo, <code>presente = IDLE</code> y el cable está en 1 <a href="#s7">→07</a> <a href="#s15">→15</a>.</li>
+    <li>Llega un tick y hay letra: <code>HAY_DATO = 1</code> y <code>CARGA = 1</code> <a href="#s9">→09</a>; eso es <code>tx_pop</code>.</li>
+    <li>En ese flanco el TSR se carga con 0100_0001 <a href="#s11">→11</a>, se toma la foto con paridad 0 <a href="#s10">→10</a> <a href="#s14">→14</a> y la FSM pasa a START <a href="#s6">→06</a>.</li>
+    <li>START: <code>SEL = 00</code>, el cable va a 0 durante 16 ticks <a href="#s12">→12</a>.</li>
+    <li>DATOS: sale TSR[0]; con cada <code>FIN_BIT</code> se activa <code>DESPLAZA</code>, el TSR se corre y <code>CUENTA_BIT</code> sube <a href="#s11">→11</a> <a href="#s13">→13</a>. Salen 1 0 0 0 0 0 1 0.</li>
+    <li>Con <code>ULTIMO = 1</code> y <code>CON_PARIDAD = 1</code> pasa a PARIDAD: sale el 0 guardado <a href="#s6">→06</a>.</li>
+    <li>STOP: el cable va a 1 durante 16 ticks. La fila está vacía, así que vuelve a IDLE y <code>tsr_empty = 1</code> <a href="#s15">→15</a>.</li>
+  </ol>
+</section>
+
+<details class="full">
+  <summary>Ver el archivo completo</summary>
+  <div class="code"><pre><span class="ln">  1</span>  <span class="src">`timescale 1ns / 1ps</span>
+<span class="ln">  2</span>  <span class="src"></span>
+<span class="ln">  3</span>  <span class="src">module uart_tx_ctrl (</span>
+<span class="ln">  4</span>  <span class="src">    input  logic       clk,</span>
+<span class="ln">  5</span>  <span class="src">    input  logic       rst,</span>
+<span class="ln">  6</span>  <span class="src">    input  logic       bclk_tick,</span>
+<span class="ln">  7</span>  <span class="src">    input  logic       osm_sel,</span>
+<span class="ln">  8</span>  <span class="src">    input  logic [7:0] tx_data,</span>
+<span class="ln">  9</span>  <span class="src">    input  logic       tx_empty,</span>
+<span class="ln"> 10</span>  <span class="src">    input  logic [1:0] wls,</span>
+<span class="ln"> 11</span>  <span class="src">    input  logic       pen,</span>
+<span class="ln"> 12</span>  <span class="src">    input  logic       eps,</span>
+<span class="ln"> 13</span>  <span class="src">    input  logic       sp,</span>
+<span class="ln"> 14</span>  <span class="src">    input  logic       stb,</span>
+<span class="ln"> 15</span>  <span class="src">    input  logic       bc,</span>
+<span class="ln"> 16</span>  <span class="src">    input  logic       utrst,</span>
+<span class="ln"> 17</span>  <span class="src">    input  logic       cts_n,</span>
+<span class="ln"> 18</span>  <span class="src">    input  logic       afe,</span>
+<span class="ln"> 19</span>  <span class="src">    input  logic       loop,</span>
+<span class="ln"> 20</span>  <span class="src">    output logic       txd,</span>
+<span class="ln"> 21</span>  <span class="src">    output logic       tx_pop,</span>
+<span class="ln"> 22</span>  <span class="src">    output logic       tsr_empty,</span>
+<span class="ln"> 23</span>  <span class="src">    output logic       tx_serial_loop,</span>
+<span class="ln"> 24</span>  <span class="src">    output logic       tx_busy</span>
+<span class="ln"> 25</span>  <span class="src">);</span>
+<span class="ln"> 26</span>  <span class="src"></span>
+<span class="ln"> 27</span>  <span class="src">  logic [7:0] TSR;</span>
+<span class="ln"> 28</span>  <span class="src">  logic [5:0] CUENTA_TICK;</span>
+<span class="ln"> 29</span>  <span class="src">  logic [2:0] CUENTA_BIT;</span>
+<span class="ln"> 30</span>  <span class="src"></span>
+<span class="ln"> 31</span>  <span class="src">  logic [2:0] ULTIMO_BIT;</span>
+<span class="ln"> 32</span>  <span class="src">  logic       CON_PARIDAD;</span>
+<span class="ln"> 33</span>  <span class="src">  logic       BIT_PARIDAD;</span>
+<span class="ln"> 34</span>  <span class="src">  logic [5:0] FIN_BIT_N;</span>
+<span class="ln"> 35</span>  <span class="src">  logic [5:0] FIN_STOP_N;</span>
+<span class="ln"> 36</span>  <span class="src"></span>
+<span class="ln"> 37</span>  <span class="src">  logic CTS_A, CTS_B;</span>
+<span class="ln"> 38</span>  <span class="src"></span>
+<span class="ln"> 39</span>  <span class="src">  logic       FIN_BIT;</span>
+<span class="ln"> 40</span>  <span class="src">  logic       ULTIMO;</span>
+<span class="ln"> 41</span>  <span class="src">  logic       HAY_DATO;</span>
+<span class="ln"> 42</span>  <span class="src">  logic       CARGA;</span>
+<span class="ln"> 43</span>  <span class="src">  logic       DESPLAZA;</span>
+<span class="ln"> 44</span>  <span class="src">  logic [7:0] MASCARA;</span>
+<span class="ln"> 45</span>  <span class="src">  logic       PARIDAD_CALC;</span>
+<span class="ln"> 46</span>  <span class="src">  logic [1:0] SEL;</span>
+<span class="ln"> 47</span>  <span class="src">  logic       OCUPADO;</span>
+<span class="ln"> 48</span>  <span class="src">  logic       LINEA;</span>
+<span class="ln"> 49</span>  <span class="src"></span>
+<span class="ln"> 50</span>  <span class="src">  typedef enum logic [2:0] {</span>
+<span class="ln"> 51</span>  <span class="src">    IDLE    = 3&#x27;b000,</span>
+<span class="ln"> 52</span>  <span class="src">    START   = 3&#x27;b001,</span>
+<span class="ln"> 53</span>  <span class="src">    DATOS   = 3&#x27;b010,</span>
+<span class="ln"> 54</span>  <span class="src">    PARIDAD = 3&#x27;b011,</span>
+<span class="ln"> 55</span>  <span class="src">    STOP    = 3&#x27;b100</span>
+<span class="ln"> 56</span>  <span class="src">  } estado_t;</span>
+<span class="ln"> 57</span>  <span class="src"></span>
+<span class="ln"> 58</span>  <span class="src">  estado_t presente, futuro;</span>
+<span class="ln"> 59</span>  <span class="src"></span>
+<span class="ln"> 60</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln"> 61</span>  <span class="src">    if (rst || !utrst)</span>
+<span class="ln"> 62</span>  <span class="src">      presente &lt;= IDLE;</span>
+<span class="ln"> 63</span>  <span class="src">    else</span>
+<span class="ln"> 64</span>  <span class="src">      presente &lt;= futuro;</span>
+<span class="ln"> 65</span>  <span class="src"></span>
+<span class="ln"> 66</span>  <span class="src">  always_comb begin</span>
+<span class="ln"> 67</span>  <span class="src">    case (presente)</span>
+<span class="ln"> 68</span>  <span class="src">      IDLE:</span>
+<span class="ln"> 69</span>  <span class="src">        if (bclk_tick &amp;&amp; HAY_DATO)</span>
+<span class="ln"> 70</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 71</span>  <span class="src">        else</span>
+<span class="ln"> 72</span>  <span class="src">          futuro = IDLE;</span>
+<span class="ln"> 73</span>  <span class="src"></span>
+<span class="ln"> 74</span>  <span class="src">      START:</span>
+<span class="ln"> 75</span>  <span class="src">        if (FIN_BIT)</span>
+<span class="ln"> 76</span>  <span class="src">          futuro = DATOS;</span>
+<span class="ln"> 77</span>  <span class="src">        else</span>
+<span class="ln"> 78</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 79</span>  <span class="src"></span>
+<span class="ln"> 80</span>  <span class="src">      DATOS:</span>
+<span class="ln"> 81</span>  <span class="src">        if (FIN_BIT &amp;&amp; ULTIMO)</span>
+<span class="ln"> 82</span>  <span class="src">          futuro = CON_PARIDAD ? PARIDAD : STOP;</span>
+<span class="ln"> 83</span>  <span class="src">        else</span>
+<span class="ln"> 84</span>  <span class="src">          futuro = DATOS;</span>
+<span class="ln"> 85</span>  <span class="src"></span>
+<span class="ln"> 86</span>  <span class="src">      PARIDAD:</span>
+<span class="ln"> 87</span>  <span class="src">        if (FIN_BIT)</span>
+<span class="ln"> 88</span>  <span class="src">          futuro = STOP;</span>
+<span class="ln"> 89</span>  <span class="src">        else</span>
+<span class="ln"> 90</span>  <span class="src">          futuro = PARIDAD;</span>
+<span class="ln"> 91</span>  <span class="src"></span>
+<span class="ln"> 92</span>  <span class="src">      STOP:</span>
+<span class="ln"> 93</span>  <span class="src">        if (FIN_BIT &amp;&amp; HAY_DATO)</span>
+<span class="ln"> 94</span>  <span class="src">          futuro = START;</span>
+<span class="ln"> 95</span>  <span class="src">        else if (FIN_BIT)</span>
+<span class="ln"> 96</span>  <span class="src">          futuro = IDLE;</span>
+<span class="ln"> 97</span>  <span class="src">        else</span>
+<span class="ln"> 98</span>  <span class="src">          futuro = STOP;</span>
+<span class="ln"> 99</span>  <span class="src"></span>
+<span class="ln">100</span>  <span class="src">      default:</span>
+<span class="ln">101</span>  <span class="src">        futuro = IDLE;</span>
+<span class="ln">102</span>  <span class="src">    endcase</span>
+<span class="ln">103</span>  <span class="src">  end</span>
+<span class="ln">104</span>  <span class="src"></span>
+<span class="ln">105</span>  <span class="src">  always_comb begin</span>
+<span class="ln">106</span>  <span class="src">    case (presente)</span>
+<span class="ln">107</span>  <span class="src">      IDLE: begin</span>
+<span class="ln">108</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">109</span>  <span class="src">        OCUPADO = 1&#x27;b0;</span>
+<span class="ln">110</span>  <span class="src">      end</span>
+<span class="ln">111</span>  <span class="src">      START: begin</span>
+<span class="ln">112</span>  <span class="src">        SEL     = 2&#x27;b00;</span>
+<span class="ln">113</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">114</span>  <span class="src">      end</span>
+<span class="ln">115</span>  <span class="src">      DATOS: begin</span>
+<span class="ln">116</span>  <span class="src">        SEL     = 2&#x27;b01;</span>
+<span class="ln">117</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">118</span>  <span class="src">      end</span>
+<span class="ln">119</span>  <span class="src">      PARIDAD: begin</span>
+<span class="ln">120</span>  <span class="src">        SEL     = 2&#x27;b10;</span>
+<span class="ln">121</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">122</span>  <span class="src">      end</span>
+<span class="ln">123</span>  <span class="src">      STOP: begin</span>
+<span class="ln">124</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">125</span>  <span class="src">        OCUPADO = 1&#x27;b1;</span>
+<span class="ln">126</span>  <span class="src">      end</span>
+<span class="ln">127</span>  <span class="src">      default: begin</span>
+<span class="ln">128</span>  <span class="src">        SEL     = 2&#x27;b11;</span>
+<span class="ln">129</span>  <span class="src">        OCUPADO = 1&#x27;b0;</span>
+<span class="ln">130</span>  <span class="src">      end</span>
+<span class="ln">131</span>  <span class="src">    endcase</span>
+<span class="ln">132</span>  <span class="src">  end</span>
+<span class="ln">133</span>  <span class="src"></span>
+<span class="ln">134</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">135</span>  <span class="src">    if (rst) begin</span>
+<span class="ln">136</span>  <span class="src">      CTS_A &lt;= 1&#x27;b1;</span>
+<span class="ln">137</span>  <span class="src">      CTS_B &lt;= 1&#x27;b1;</span>
+<span class="ln">138</span>  <span class="src">    end else begin</span>
+<span class="ln">139</span>  <span class="src">      CTS_A &lt;= cts_n;</span>
+<span class="ln">140</span>  <span class="src">      CTS_B &lt;= CTS_A;</span>
+<span class="ln">141</span>  <span class="src">    end</span>
+<span class="ln">142</span>  <span class="src"></span>
+<span class="ln">143</span>  <span class="src">  assign HAY_DATO = !tx_empty &amp;&amp; !(afe &amp;&amp; CTS_B);</span>
+<span class="ln">144</span>  <span class="src">  assign FIN_BIT  = bclk_tick &amp;&amp; (CUENTA_TICK == ((presente == STOP) ? FIN_STOP_N : FIN_BIT_N));</span>
+<span class="ln">145</span>  <span class="src">  assign ULTIMO   = (CUENTA_BIT == ULTIMO_BIT);</span>
+<span class="ln">146</span>  <span class="src">  assign CARGA    = !rst &amp;&amp; utrst &amp;&amp; bclk_tick &amp;&amp; HAY_DATO &amp;&amp;</span>
+<span class="ln">147</span>  <span class="src">                    ((presente == IDLE) || (presente == STOP &amp;&amp; FIN_BIT));</span>
+<span class="ln">148</span>  <span class="src">  assign DESPLAZA = (presente == DATOS) &amp;&amp; FIN_BIT;</span>
+<span class="ln">149</span>  <span class="src"></span>
+<span class="ln">150</span>  <span class="src">  assign MASCARA      = 8&#x27;hFF &gt;&gt; (2&#x27;d3 - wls);</span>
+<span class="ln">151</span>  <span class="src">  assign PARIDAD_CALC = ^(tx_data &amp; MASCARA);</span>
+<span class="ln">152</span>  <span class="src"></span>
+<span class="ln">153</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">154</span>  <span class="src">    if (rst || !utrst)</span>
+<span class="ln">155</span>  <span class="src">      TSR &lt;= 8&#x27;hFF;</span>
+<span class="ln">156</span>  <span class="src">    else if (CARGA)</span>
+<span class="ln">157</span>  <span class="src">      TSR &lt;= tx_data;</span>
+<span class="ln">158</span>  <span class="src">    else if (DESPLAZA)</span>
+<span class="ln">159</span>  <span class="src">      TSR &lt;= {1&#x27;b1, TSR[7:1]};</span>
+<span class="ln">160</span>  <span class="src"></span>
+<span class="ln">161</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">162</span>  <span class="src">    if (rst || !utrst || CARGA)</span>
+<span class="ln">163</span>  <span class="src">      CUENTA_TICK &lt;= 6&#x27;d0;</span>
+<span class="ln">164</span>  <span class="src">    else if (bclk_tick &amp;&amp; presente != IDLE)</span>
+<span class="ln">165</span>  <span class="src">      CUENTA_TICK &lt;= FIN_BIT ? 6&#x27;d0 : CUENTA_TICK + 6&#x27;d1;</span>
+<span class="ln">166</span>  <span class="src"></span>
+<span class="ln">167</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">168</span>  <span class="src">    if (rst || !utrst || CARGA)</span>
+<span class="ln">169</span>  <span class="src">      CUENTA_BIT &lt;= 3&#x27;d0;</span>
+<span class="ln">170</span>  <span class="src">    else if (DESPLAZA)</span>
+<span class="ln">171</span>  <span class="src">      CUENTA_BIT &lt;= ULTIMO ? 3&#x27;d0 : CUENTA_BIT + 3&#x27;d1;</span>
+<span class="ln">172</span>  <span class="src"></span>
+<span class="ln">173</span>  <span class="src">  always_ff @(posedge clk)</span>
+<span class="ln">174</span>  <span class="src">    if (rst || !utrst) begin</span>
+<span class="ln">175</span>  <span class="src">      ULTIMO_BIT  &lt;= 3&#x27;d7;</span>
+<span class="ln">176</span>  <span class="src">      CON_PARIDAD &lt;= 1&#x27;b0;</span>
+<span class="ln">177</span>  <span class="src">      BIT_PARIDAD &lt;= 1&#x27;b1;</span>
+<span class="ln">178</span>  <span class="src">      FIN_BIT_N   &lt;= 6&#x27;d15;</span>
+<span class="ln">179</span>  <span class="src">      FIN_STOP_N  &lt;= 6&#x27;d15;</span>
+<span class="ln">180</span>  <span class="src">    end else if (CARGA) begin</span>
+<span class="ln">181</span>  <span class="src">      ULTIMO_BIT  &lt;= {1&#x27;b1, wls};</span>
+<span class="ln">182</span>  <span class="src">      CON_PARIDAD &lt;= pen;</span>
+<span class="ln">183</span>  <span class="src">      BIT_PARIDAD &lt;= sp ? ~eps : (eps ? PARIDAD_CALC : ~PARIDAD_CALC);</span>
+<span class="ln">184</span>  <span class="src">      FIN_BIT_N   &lt;= osm_sel ? 6&#x27;d12 : 6&#x27;d15;</span>
+<span class="ln">185</span>  <span class="src">      FIN_STOP_N  &lt;= !stb           ? (osm_sel ? 6&#x27;d12 : 6&#x27;d15)</span>
+<span class="ln">186</span>  <span class="src">                   : (wls == 2&#x27;b00) ? (osm_sel ? 6&#x27;d18 : 6&#x27;d23)</span>
+<span class="ln">187</span>  <span class="src">                   :                  (osm_sel ? 6&#x27;d25 : 6&#x27;d31);</span>
+<span class="ln">188</span>  <span class="src">    end</span>
+<span class="ln">189</span>  <span class="src"></span>
+<span class="ln">190</span>  <span class="src">  always_comb begin</span>
+<span class="ln">191</span>  <span class="src">    case (SEL)</span>
+<span class="ln">192</span>  <span class="src">      2&#x27;b00:   LINEA = 1&#x27;b0;</span>
+<span class="ln">193</span>  <span class="src">      2&#x27;b01:   LINEA = TSR[0];</span>
+<span class="ln">194</span>  <span class="src">      2&#x27;b10:   LINEA = BIT_PARIDAD;</span>
+<span class="ln">195</span>  <span class="src">      default: LINEA = 1&#x27;b1;</span>
+<span class="ln">196</span>  <span class="src">    endcase</span>
+<span class="ln">197</span>  <span class="src">  end</span>
+<span class="ln">198</span>  <span class="src"></span>
+<span class="ln">199</span>  <span class="src">  assign tx_serial_loop = LINEA &amp; ~bc;</span>
+<span class="ln">200</span>  <span class="src">  assign txd            = loop ? 1&#x27;b1 : tx_serial_loop;</span>
+<span class="ln">201</span>  <span class="src">  assign tx_pop         = CARGA;</span>
+<span class="ln">202</span>  <span class="src">  assign tsr_empty      = !OCUPADO;</span>
+<span class="ln">203</span>  <span class="src">  assign tx_busy        = OCUPADO;</span>
+<span class="ln">204</span>  <span class="src"></span>
+<span class="ln">205</span>  <span class="src">endmodule</span></pre></div>
+</details>
+<a class="top" href="#">↑ volver arriba</a>
+</div>
+
+<script>
+(function(){
+  const KW=/\b(module|endmodule|input|output|logic|always_ff|always_comb|posedge|if|else|begin|end|case|endcase|default|assign|typedef|enum)\b/g;
+  const ST=/\b(IDLE|START|DATOS|PARIDAD|STOP)\b/g;
+  const NUM=/(\d+'[bdh][0-9A-Fa-f_]+|`timescale)/g;
+  document.querySelectorAll('.src').forEach(el=>{
+    let t=el.textContent;
+    const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // tokenizar para no colorear dentro de etiquetas ya insertadas
+    const parts=t.split(/(\d+'[bdh][0-9A-Fa-f_]+|`timescale|\b\w+\b)/g);
+    el.innerHTML=parts.map(p=>{
+      if(!p) return '';
+      if(/^(\d+'[bdh][0-9A-Fa-f_]+|`timescale)$/.test(p)) return '<span class="nm">'+esc(p)+'</span>';
+      if(/^(module|endmodule|input|output|logic|always_ff|always_comb|posedge|if|else|begin|end|case|endcase|default|assign|typedef|enum)$/.test(p)) return '<span class="kw">'+p+'</span>';
+      if(/^(IDLE|START|DATOS|PARIDAD|STOP)$/.test(p)) return '<span class="st">'+p+'</span>';
+      return esc(p);
+    }).join('');
+  });
+})();
+</script>
+
+</body></html>

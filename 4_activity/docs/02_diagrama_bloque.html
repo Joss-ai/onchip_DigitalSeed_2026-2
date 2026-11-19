@@ -1,0 +1,575 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>TX por dentro</title></head><body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: un diagrama de bloque grande arriba (como el dibujo a mano) y debajo una rejilla con cada pieza ampliada, todas movidas por el mismo reloj de ticks */
+:root{
+  --paper:#F1F3F0; --panel:#FFFFFF; --ink:#17201C; --muted:#5A655F; --line:#CDD4CF;
+  --accent:#A8530A; --accent-soft:#F6E6D6; --block:#F4DCD3; --block-edge:#B5543A; --fsm:#E58C76;
+  --c-start:#C92A2A; --c-data:#1864AB; --c-par:#8E33A8; --c-stop:#2B7A3B; --c-idle:#7B8680;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A; --block:#3A2621; --block-edge:#E07A5F; --fsm:#7A3B2E;
+  --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#8E9993; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A; --block:#3A2621; --block-edge:#E07A5F; --fsm:#7A3B2E;
+  --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#8E9993; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:0 56px}
+.wrap{max-width:1120px; margin:0 auto; display:grid; gap:22px}
+h1,h2,h3{font-family:var(--f-display); margin:0; line-height:1.15; text-wrap:balance}
+h1{font-size:clamp(1.9rem,4.6vw,3rem); font-weight:800; letter-spacing:-.02em}
+h2{font-size:1.35rem; font-weight:800}
+p{margin:.4em 0}
+code{font-family:var(--f-mono); font-size:.86em; background:var(--accent-soft); padding:.05em .35em; border-radius:4px}
+.eyebrow{font-family:var(--f-mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+header{padding-block:36px 4px; display:grid; gap:10px; border-bottom:2px solid var(--ink); padding-bottom:18px}
+header p{max-width:70ch; margin:0}
+
+.controls{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--paper); padding-block:10px; border-bottom:1px solid var(--line);
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--paper)}
+.btn{font:inherit; font-family:var(--f-mono); font-size:.82rem; border:1px solid var(--ink); background:var(--ink); color:var(--paper); padding:7px 13px; border-radius:6px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:hover{opacity:.85}
+.btn:focus-visible, input:focus-visible, select:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.controls label{font-family:var(--f-mono); font-size:.78rem; color:var(--muted); display:flex; gap:6px; align-items:center}
+.controls input[type=text], .controls select{font-family:var(--f-mono); font-size:.85rem; padding:5px 7px; width:64px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink)}
+.controls select{width:auto}
+.status{font-family:var(--f-mono); font-size:.85rem; margin-left:auto; font-variant-numeric:tabular-nums}
+
+.diagram{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; overflow-x:auto}
+.diagram svg{display:block; width:100%; min-width:860px; height:auto}
+.blk{fill:var(--block); stroke:var(--block-edge); stroke-width:2.5}
+.sub{fill:var(--panel); stroke:var(--block-edge); stroke-width:1.6}
+.sub.fsm{fill:var(--fsm); fill-opacity:.45}
+.sub.extra{stroke-dasharray:5 4}
+.t{fill:var(--ink); font-family:var(--f-body); font-size:13px}
+.tb{fill:var(--ink); font-family:var(--f-display); font-weight:600; font-size:16px}
+.tl{fill:var(--block-edge); font-family:var(--f-display); font-weight:800; font-size:15px}
+.tm{fill:var(--muted); font-family:var(--f-mono); font-size:11px}
+.tv{fill:var(--accent); font-family:var(--f-mono); font-size:13px; font-weight:600}
+.tin{fill:var(--ink); font-family:var(--f-mono); font-size:13px; font-weight:600}
+.tout{fill:var(--block-edge); font-family:var(--f-mono); font-size:13px; font-weight:600}
+.w{stroke:var(--ink); stroke-width:1.7; fill:none}
+.wo{stroke:var(--block-edge); stroke-width:2; fill:none}
+.wi{stroke:var(--muted); stroke-width:1.4; fill:none; stroke-dasharray:4 3}
+.wi.on{stroke:var(--accent); stroke-width:2.4; stroke-dasharray:none}
+.ah{fill:var(--ink)} .aho{fill:var(--block-edge)} .ahi{fill:var(--muted)} .aha{fill:var(--accent)}
+.cell{stroke:var(--line); stroke-width:1; fill:var(--panel)}
+.cell.out{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:820px){ .grid{grid-template-columns:1fr} }
+.card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:grid; gap:10px; min-width:0; align-content:start}
+.card .head{display:flex; gap:10px; align-items:baseline}
+.card .letter{font-family:var(--f-display); font-weight:800; font-size:1.6rem; color:var(--block-edge); line-height:1}
+.card ul{margin:0; padding-left:1.15em} .card li{margin:.2em 0; font-size:.94rem}
+.card .why{font-size:.93rem; border-left:3px solid var(--accent); padding:6px 10px; background:var(--paper); border-radius:0 6px 6px 0; min-height:3.2em}
+.viz{overflow-x:auto}
+.viz svg{display:block; width:100%; height:auto; min-width:420px}
+
+.trace{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; display:grid; gap:8px}
+.trace svg{display:block; width:100%; height:auto; min-width:640px}
+.trace .scroll{overflow-x:auto}
+.seg-START{fill:var(--c-start)} .seg-DATA{fill:var(--c-data)} .seg-PARITY{fill:var(--c-par)} .seg-STOP{fill:var(--c-stop)} .seg-IDLE{fill:var(--c-idle)}
+.note{font-size:.92rem; color:var(--muted)}
+.code{background:var(--paper); border:1px solid var(--line); border-radius:8px; overflow-x:auto}
+.code pre{margin:0; padding:10px 12px; font-family:var(--f-mono); font-size:.76rem; line-height:1.5}
+.io{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:820px){ .io{grid-template-columns:1fr} }
+.io .tablewrap{overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:12px}
+.io table{border-collapse:collapse; width:100%; font-size:.9rem}
+.io th,.io td{text-align:left; padding:6px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+.io th{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--paper)}
+.io tr:last-child td{border-bottom:none}
+.io td.sig{font-family:var(--f-mono); font-weight:600; white-space:nowrap}
+.io caption{text-align:left; font-family:var(--f-display); font-weight:800; font-size:1.1rem; padding:10px 10px 6px}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Transmitter Timing and Control · por dentro</div>
+  <h1>TX por dentro</h1>
+  <p>El bloque con sus <b>16 entradas y 5 salidas</b> y, dentro, sus cuatro piezas: <b>(a)</b> TSR, <b>(b)</b> contador de ticks, <b>(c)</b> contador de bits y <b>(d)</b> FSM. Los nombres coinciden con <code>uart_tx_ctrl.sv</code>. Pulsa <b>+1 tick</b> y mira cómo se mueven todas juntas mientras se envía la letra.</p>
+</header>
+
+<div class="controls" role="toolbar" aria-label="Controles de simulación">
+  <button class="btn" id="bTick" type="button">+1 tick</button>
+  <button class="btn ghost" id="bBit" type="button">+1 bit</button>
+  <button class="btn ghost" id="bPlay" type="button">▶ Reproducir</button>
+  <button class="btn ghost" id="bReset" type="button">Reiniciar</button>
+  <label for="iByte">byte (hex) <input id="iByte" type="text" value="41" maxlength="2"></label>
+  <label for="iPar">paridad <select id="iPar"><option value="even" selected>par</option><option value="odd">impar</option><option value="none">sin</option></select></label>
+  <span class="status" id="status"></span>
+</div>
+
+<!-- =================== DIAGRAMA DE BLOQUE =================== -->
+<div class="diagram">
+<svg viewBox="0 0 1120 640" role="img" aria-label="Diagrama interno del bloque Transmitter Timing and Control">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="aho" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ahi" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="aha" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+
+  <!-- bloque grande -->
+  <rect class="blk" x="240" y="95" width="660" height="455" rx="10"/>
+  <text class="tm" x="250" y="88">uart_tx_ctrl · Transmitter Timing &amp; Control</text>
+
+  <!-- (a) TSR -->
+  <rect class="sub" x="285" y="118" width="220" height="100" rx="8"/>
+  <text class="tl" x="297" y="140">(a)</text><text class="tb" x="325" y="140">TSR</text>
+  <g id="mTSR"></g>
+  <text class="tm" x="297" y="208">TSR[7:0]</text>
+
+  <!-- (b) ticks -->
+  <rect class="sub" x="530" y="118" width="150" height="100" rx="8"/>
+  <text class="tl" x="542" y="140">(b)</text><text class="tb" x="570" y="140">Contador</text>
+  <text class="tb" x="542" y="160">de ticks</text>
+  <text class="tv" id="mTick" x="542" y="190">0 / 15</text>
+  <text class="tm" x="542" y="208">CUENTA_TICK</text>
+
+  <!-- salida (extra) -->
+  <rect class="sub extra" x="710" y="118" width="160" height="100" rx="8"/>
+  <text class="tb" x="722" y="140">Lógica de</text>
+  <text class="tb" x="722" y="160">salida</text>
+  <text class="tm" x="722" y="180">LINEA según SEL</text>
+  <text class="tm" x="722" y="196">+ break + loopback</text>
+  <text class="tv" id="mOut" x="722" y="212">txd = 1</text>
+
+  <!-- foto config (extra) -->
+  <rect class="sub extra" x="285" y="262" width="220" height="92" rx="8"/>
+  <text class="tb" x="297" y="284">Foto de configuración</text>
+  <text class="tm" x="297" y="304">copia del LCR al tomar la letra:</text>
+  <text class="tm" x="297" y="320">nº bits, paridad, nº stop,</text>
+  <text class="tm" x="297" y="336">ticks por bit</text>
+
+  <!-- (c) bits -->
+  <rect class="sub" x="700" y="262" width="150" height="92" rx="8"/>
+  <text class="tl" x="712" y="284">(c)</text><text class="tb" x="740" y="284">Contador</text>
+  <text class="tb" x="712" y="304">de bits</text>
+  <text class="tv" id="mBit" x="712" y="328">D0 de D7</text>
+  <text class="tm" x="712" y="344">CUENTA_BIT</text>
+
+  <!-- (d) FSM -->
+  <rect class="sub fsm" x="285" y="395" width="585" height="125" rx="8"/>
+  <text class="tl" x="297" y="418">(d)</text><text class="tb" x="325" y="418">FSM · máquina de estados</text><text class="tm" x="560" y="418">presente / futuro</text>
+  <g id="mFSM"></g>
+
+  <!-- ===== cables internos ===== -->
+  <!-- ticks -> FSM : fin de bit -->
+  <path class="wi" id="wDone" d="M605,218 L605,395" marker-end="url(#a3)"/>
+  <text class="tm" x="612" y="300">FIN_BIT</text>
+  <!-- bits -> FSM : último bit -->
+  <path class="wi" id="wLast" d="M775,354 L775,395" marker-end="url(#a3)"/>
+  <text class="tm" x="782" y="378">ULTIMO</text>
+  <!-- FSM -> TSR : cargar / desplazar -->
+  <path class="wi" id="wShift" d="M285,450 L262,450 L262,190 L285,190" marker-end="url(#a3)"/>
+  <text class="tm" x="270" y="378">CARGA / DESPLAZA</text>
+  <!-- config -> ticks : ticks por bit -->
+  <path class="wi" d="M470,262 L470,240 L560,240 L560,218" marker-end="url(#a3)"/>
+  <text class="tm" x="478" y="236">FIN_BIT_N / FIN_STOP_N</text>
+  <!-- config -> bits : último bit -->
+  <path class="wi" d="M505,320 L700,320" marker-end="url(#a3)"/>
+  <text class="tm" x="540" y="314">ULTIMO_BIT</text>
+  <!-- TSR bit0 -> salida -->
+  <path class="wi" id="wBit0" d="M480,118 L480,106 L740,106 L740,118" marker-end="url(#a3)"/>
+  <text class="tm" x="560" y="102">TSR[0]</text>
+  <!-- FSM -> salida : estado -->
+  <path class="wi" d="M860,395 L860,370 L885,370 L885,200 L870,200" marker-end="url(#a3)"/>
+  <text class="tm" x="893" y="290" text-anchor="middle" transform="rotate(-90 893 290)">SEL</text>
+
+  <!-- ===== ENTRADAS (izquierda) ===== -->
+  <path class="w" d="M70,168 L285,168" marker-end="url(#a1)"/>
+  <text class="tin" x="70" y="160">tx_data[7:0]</text>
+  <path class="w" d="M215,160 L225,176" />
+  <text class="tm" x="215" y="155">8</text>
+  <text class="tm" x="70" y="184">carácter del TX FIFO</text>
+
+  <path class="w" d="M36,278 L285,278" marker-end="url(#a1)"/><text class="tin" x="36" y="272">wls[1:0]</text><text class="tm" x="122" y="272">bits por carácter</text>
+  <path class="w" d="M36,300 L285,300" marker-end="url(#a1)"/><text class="tin" x="36" y="294">pen eps sp</text><text class="tm" x="122" y="294">paridad</text>
+  <path class="w" d="M36,322 L285,322" marker-end="url(#a1)"/><text class="tin" x="36" y="316">stb</text><text class="tm" x="122" y="316">nº de stop</text>
+  <path class="w" d="M36,344 L285,344" marker-end="url(#a1)"/><text class="tin" x="36" y="338">osm_sel</text><text class="tm" x="122" y="338">16 ó 13 ticks</text>
+
+  <path class="w" d="M70,470 L285,470" marker-end="url(#a1)"/><text class="tin" x="70" y="464">tx_empty</text><text class="tm" x="70" y="486">→ HAY_DATO</text>
+
+  <!-- ===== ENTRADAS (arriba) ===== -->
+  <path class="w" d="M605,30 L605,118" marker-end="url(#a1)"/>
+  <text class="tin" x="613" y="40">bclk_tick</text><text class="tm" x="613" y="56">metrónomo (Baud gen)</text>
+  <path class="w" d="M770,30 L770,118" marker-end="url(#a1)"/>
+  <text class="tin" x="778" y="40">bc</text><text class="tm" x="778" y="56">fuerza 0</text>
+  <path class="w" d="M850,30 L850,118" marker-end="url(#a1)"/>
+  <text class="tin" x="858" y="40">loop</text><text class="tm" x="858" y="56">loopback</text>
+
+  <!-- ===== ENTRADAS (abajo) ===== -->
+  <path class="w" d="M330,610 L330,520" marker-end="url(#a1)"/><text class="tin" x="330" y="628" text-anchor="middle">clk</text>
+  <path class="w" d="M410,610 L410,520" marker-end="url(#a1)"/><text class="tin" x="410" y="628" text-anchor="middle">rst</text>
+  <path class="w" d="M510,610 L510,520" marker-end="url(#a1)"/><text class="tin" x="510" y="628" text-anchor="middle">utrst</text><text class="tm" x="518" y="590">ON / reset TX</text>
+  <path class="w" d="M650,610 L650,520" marker-end="url(#a1)"/><text class="tin" x="650" y="628" text-anchor="middle">cts_n</text><text class="tm" x="658" y="578">enviar / esperar</text><text class="tm" x="658" y="592">→ CTS_A → CTS_B</text>
+  <path class="w" d="M790,610 L790,520" marker-end="url(#a1)"/><text class="tin" x="790" y="628" text-anchor="middle">afe</text><text class="tm" x="798" y="590">obedecer CTS</text>
+
+  <!-- ===== SALIDAS (derecha) ===== -->
+  <path class="wo" d="M870,150 L1040,150" marker-end="url(#a2)"/><text class="tout" x="915" y="143">txd</text><text class="tm" x="955" y="143">pin TX</text>
+  <path class="wo" d="M870,185 L900,185 L1040,185" marker-end="url(#a2)"/><text class="tout" x="915" y="178">tx_serial_loop</text><text class="tm" x="915" y="199">→ receptor</text>
+
+  <path class="wo" d="M870,430 L1040,430" marker-end="url(#a2)"/><text class="tout" x="915" y="423">tx_pop</text><text class="tm" x="975" y="423">= CARGA → TX FIFO</text>
+  <path class="wo" d="M870,465 L1040,465" marker-end="url(#a2)"/><text class="tout" x="915" y="458">tsr_empty</text><text class="tm" x="1000" y="458">= !OCUPADO</text>
+  <path class="wo" d="M870,500 L1040,500" marker-end="url(#a2)"/><text class="tout" x="915" y="493">tx_busy</text><text class="tm" x="985" y="493">= OCUPADO</text>
+</svg>
+</div>
+<p class="note">Las cajas de borde punteado (foto de configuración y lógica de salida) son piezas pequeñas de apoyo; el trabajo principal lo hacen (a), (b), (c) y (d). Las líneas internas se encienden en naranja cuando están actuando en ese tick.</p>
+
+<div class="io">
+  <div class="tablewrap"><table>
+    <caption>16 entradas</caption>
+    <thead><tr><th>Señal</th><th>Viene de</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td class="sig">clk</td><td>Sistema</td><td>Reloj</td></tr>
+      <tr><td class="sig">rst</td><td>Sistema</td><td>Reset general</td></tr>
+      <tr><td class="sig">bclk_tick</td><td>Baud gen</td><td>Metrónomo: 16 (o 13) por bit</td></tr>
+      <tr><td class="sig">osm_sel</td><td>Control Logic</td><td>16 ó 13 ticks por bit</td></tr>
+      <tr><td class="sig">tx_data[7:0]</td><td>TX FIFO</td><td>La letra a enviar</td></tr>
+      <tr><td class="sig">tx_empty</td><td>TX FIFO</td><td>¿La fila está vacía?</td></tr>
+      <tr><td class="sig">wls[1:0]</td><td>LCR</td><td>Bits por letra (5–8)</td></tr>
+      <tr><td class="sig">pen</td><td>LCR</td><td>Con o sin paridad</td></tr>
+      <tr><td class="sig">eps</td><td>LCR</td><td>Paridad par o impar</td></tr>
+      <tr><td class="sig">sp</td><td>LCR</td><td>Paridad fija</td></tr>
+      <tr><td class="sig">stb</td><td>LCR</td><td>1, 1.5 ó 2 stop</td></tr>
+      <tr><td class="sig">bc</td><td>LCR</td><td>Break: fuerza la línea a 0</td></tr>
+      <tr><td class="sig">utrst</td><td>PWREMU_MGMT</td><td>Encender / resetear el TX</td></tr>
+      <tr><td class="sig">cts_n</td><td>Pin externo</td><td>Enviar (0) o esperar (1)</td></tr>
+      <tr><td class="sig">afe</td><td>MCR</td><td>Obedecer cts_n</td></tr>
+      <tr><td class="sig">loop</td><td>MCR</td><td>Modo loopback</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap" style="align-self:start"><table>
+    <caption>5 salidas</caption>
+    <thead><tr><th>Señal</th><th>Va hacia</th><th>Qué indica</th></tr></thead>
+    <tbody>
+      <tr><td class="sig">txd</td><td>Pin TX</td><td>La línea serie: aquí sale la letra</td></tr>
+      <tr><td class="sig">tx_pop</td><td>TX FIFO</td><td>“Ya tomé la letra” (= CARGA)</td></tr>
+      <tr><td class="sig">tsr_empty</td><td>LSR</td><td>No hay letra enviándose (forma TEMT)</td></tr>
+      <tr><td class="sig">tx_serial_loop</td><td>Receptor</td><td>Copia de la línea para loopback</td></tr>
+      <tr><td class="sig">tx_busy</td><td>Emulación</td><td>Está enviando (= OCUPADO)</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- =================== DETALLE DE CADA PIEZA =================== -->
+<div class="grid">
+  <div class="card">
+    <div class="head"><span class="letter">a</span><h2>TSR · registro de desplazamiento</h2></div>
+    <div class="viz"><svg id="vTSR" viewBox="0 0 520 170"></svg></div>
+    <ul>
+      <li>Guarda el carácter que se está enviando (8 casillas).</li>
+      <li>La casilla de la derecha, <code>tsr[0]</code>, es la que sale por el cable.</li>
+      <li><b>Se carga</b> cuando la FSM toma el carácter del FIFO (<code>tx_pop</code>).</li>
+      <li><b>Se desplaza</b> a la derecha al terminar cada bit de datos; por la izquierda entra un 1.</li>
+    </ul>
+    <div class="why" id="whyA"></div>
+    <div class="code"><pre>always_ff @(posedge clk)
+  if (rst || !utrst)
+    TSR &lt;= 8&#x27;hFF;
+  else if (CARGA)
+    TSR &lt;= tx_data;
+  else if (DESPLAZA)
+    TSR &lt;= {1&#x27;b1, TSR[7:1]};</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="letter">b</span><h2>Contador de ticks</h2></div>
+    <div class="viz"><svg id="vTick" viewBox="0 0 520 170"></svg></div>
+    <ul>
+      <li>Suma 1 con cada pulso <code>bclk_tick</code>.</li>
+      <li>Cuando llega al último valor (15 con 16×, 12 con 13×) y llega otro tick, avisa <b>“fin de bit”</b> y vuelve a 0.</li>
+      <li>En STOP el último valor puede ser mayor (23 ó 31) si hay 1.5 ó 2 bits de stop.</li>
+      <li>Es lo que garantiza que cada bit dure exactamente lo mismo.</li>
+    </ul>
+    <div class="why" id="whyB"></div>
+    <div class="code"><pre>assign FIN_BIT = bclk_tick &amp;&amp;
+  (CUENTA_TICK == ((presente == STOP) ? FIN_STOP_N : FIN_BIT_N));
+
+always_ff @(posedge clk)
+  if (rst || !utrst || CARGA)
+    CUENTA_TICK &lt;= 6&#x27;d0;
+  else if (bclk_tick &amp;&amp; presente != IDLE)
+    CUENTA_TICK &lt;= FIN_BIT ? 6&#x27;d0 : CUENTA_TICK + 6&#x27;d1;</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="letter">c</span><h2>Contador de bits</h2></div>
+    <div class="viz"><svg id="vBit" viewBox="0 0 520 170"></svg></div>
+    <ul>
+      <li>Solo trabaja en el estado DATA: dice qué bit de datos está saliendo.</li>
+      <li>Suma 1 cada vez que termina un bit de datos.</li>
+      <li>Se compara con el último bit (4, 5, 6 ó 7 según <code>wls</code>). Si ya es el último, la FSM pasa a PARITY o STOP.</li>
+      <li>Fuera de DATA vale 0.</li>
+    </ul>
+    <div class="why" id="whyC"></div>
+    <div class="code"><pre>assign ULTIMO   = (CUENTA_BIT == ULTIMO_BIT);
+assign DESPLAZA = (presente == DATOS) &amp;&amp; FIN_BIT;
+
+always_ff @(posedge clk)
+  if (rst || !utrst || CARGA)
+    CUENTA_BIT &lt;= 3&#x27;d0;
+  else if (DESPLAZA)
+    CUENTA_BIT &lt;= ULTIMO ? 3&#x27;d0 : CUENTA_BIT + 3&#x27;d1;</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="head"><span class="letter">d</span><h2>FSM · máquina de estados</h2></div>
+    <div class="viz"><svg id="vFSM" viewBox="0 0 520 230"></svg></div>
+    <ul>
+      <li>Es el “cerebro”: decide en qué parte de la trama vamos.</li>
+      <li>Avanza de estado solo cuando (b) dice “fin de bit”.</li>
+      <li>En DATA pregunta a (c) si ya salió el último bit.</li>
+      <li>Da las órdenes a (a): cargar o desplazar. Y genera <code>tx_pop</code>, <code>tsr_empty</code> y <code>tx_busy</code>.</li>
+    </ul>
+    <div class="why" id="whyD"></div>
+    <div class="code"><pre>always_ff @(posedge clk)
+  if (rst || !utrst) presente &lt;= IDLE;
+  else               presente &lt;= futuro;
+
+always_comb
+  case (presente)
+    IDLE:    futuro = (bclk_tick &amp;&amp; HAY_DATO) ? START : IDLE;
+    START:   futuro = FIN_BIT ? DATOS : START;
+    DATOS:   if (FIN_BIT &amp;&amp; ULTIMO)
+               futuro = CON_PARIDAD ? PARIDAD : STOP;
+             else futuro = DATOS;
+    PARIDAD: futuro = FIN_BIT ? STOP : PARIDAD;
+    STOP:    if (FIN_BIT &amp;&amp; HAY_DATO) futuro = START;
+             else if (FIN_BIT)        futuro = IDLE;
+             else                     futuro = STOP;
+    default: futuro = IDLE;
+  endcase</pre></div>
+  </div>
+</div>
+
+<!-- =================== LO QUE SALE POR EL CABLE =================== -->
+<div class="trace">
+  <h2>Lo que va saliendo por el cable (txd)</h2>
+  <div class="scroll"><svg id="vTrace" viewBox="0 0 1000 120"></svg></div>
+  <p class="note">Cada bloque de color es un bit (16 ticks). Rojo = start, azul = datos, morado = paridad, verde = stop, gris = reposo.</p>
+</div>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const NS='http://www.w3.org/2000/svg';
+  const LAST=15;            // ticks por bit - 1 (16x)
+  let S;                    // estado de la simulación
+
+  function parity(x){ let p=0; while(x){p^=x&1;x>>=1;} return p; }
+  function reset(){
+    let b=parseInt($('iByte').value,16); if(isNaN(b)) b=0x41; b&=0xFF;
+    const pm=$('iPar').value;
+    S={ byte:b, fifo:[b], st:'IDLE', tsr:0xFF, bit:0, tc:0, pen:pm!=='none',
+        par: pm==='even'? parity(b) : (pm==='odd'? 1-parity(b) : 1),
+        lastBit:7, ticks:0, history:[], event:'reset', pop:false };
+    render();
+  }
+  function serial(){ return S.st==='START'?0 : S.st==='DATA'?(S.tsr&1) : S.st==='PARITY'?S.par : 1; }
+
+  // un tick del metrónomo (bclk_tick = 1)
+  function tick(){
+    S.pop=false; S.event='';
+    S.history.push({st:S.st, v:serial(), bit:S.bit});
+    if(S.st==='IDLE'){
+      if(S.fifo.length){ S.tsr=S.fifo.shift(); S.st='START'; S.tc=0; S.bit=0; S.pop=true; S.event='load'; }
+      else S.event='idle';
+    } else if(S.tc<LAST){ S.tc++; S.event='count'; }
+    else {
+      S.tc=0;
+      if(S.st==='START'){ S.st='DATA'; S.event='toData'; }
+      else if(S.st==='DATA'){
+        S.tsr=(S.tsr>>1)|0x80;
+        if(S.bit===S.lastBit){ S.bit=0; S.st=S.pen?'PARITY':'STOP'; S.event='lastData'; }
+        else { S.bit++; S.event='shift'; }
+      }
+      else if(S.st==='PARITY'){ S.st='STOP'; S.event='toStop'; }
+      else if(S.st==='STOP'){ S.st='IDLE'; S.event='done'; }
+    }
+    S.ticks++;
+    render();
+  }
+  function nextBit(){ const st=S.st, b=S.bit; let n=0; do{ tick(); n++; } while(S.st===st && S.bit===b && n<40 && !(st==='IDLE' && S.fifo.length===0 && n>16)); }
+
+  // ------------------------------------------------ render
+  function el(tag, attrs, txt){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(txt!==undefined) e.textContent=txt; return e; }
+  const stName={IDLE:'IDLE',START:'START',DATA:'DATOS',PARITY:'PARIDAD',STOP:'STOP'};
+  const stColor={IDLE:'var(--c-idle)',START:'var(--c-start)',DATA:'var(--c-data)',PARITY:'var(--c-par)',STOP:'var(--c-stop)'};
+
+  function render(){
+    const v=serial(), done = S.event==='toData'||S.event==='shift'||S.event==='lastData'||S.event==='toStop'||S.event==='done';
+    $('status').textContent = `tick ${S.ticks} · ${stName[S.st]}${S.st==='DATA'?' D'+S.bit:''} · txd=${v}`;
+
+    // --- mini en el diagrama grande
+    const m=$('mTSR'); m.innerHTML='';
+    for(let i=7;i>=0;i--){ const x=297+(7-i)*25; m.appendChild(el('rect',{x, y:152, width:22, height:26, rx:3, class:'cell'+(i===0&&S.st==='DATA'?' out':'')}));
+      m.appendChild(el('text',{x:x+11, y:170, class:'t', 'text-anchor':'middle'}, (S.tsr>>i)&1)); }
+    $('mTick').textContent = S.st==='IDLE' ? '— (reposo)' : `${S.tc} / ${LAST}`;
+    $('mBit').textContent  = S.st==='DATA' ? `D${S.bit} de D${S.lastBit}` : '— (no es DATA)';
+    $('mOut').textContent  = `txd = ${v}`;
+    const f=$('mFSM'); f.innerHTML='';
+    ['IDLE','START','DATA','PARITY','STOP'].forEach((s,i)=>{
+      const x=310+i*110, on=S.st===s;
+      f.appendChild(el('rect',{x, y:440, width:92, height:40, rx:20, fill: on? stColor[s] : 'var(--panel)', 'fill-opacity': on? .9 : 1, stroke: stColor[s], 'stroke-width': on? 2.5:1.4}));
+      f.appendChild(el('text',{x:x+46, y:465, 'text-anchor':'middle', class:'t', style: on?'fill:#fff;font-weight:700':''}, stName[s]));
+      if(i<4) f.appendChild(el('path',{d:`M${x+92},460 L${x+110},460`, class:'w', 'marker-end':'url(#a1)'}));
+    });
+    f.appendChild(el('text',{x:310, y:505, class:'tm'}, S.pop ? '→ tx_pop = 1 (tomó el carácter del FIFO)' : (S.st==='IDLE' ? (S.fifo.length?'hay dato: lo toma en el próximo tick':'fila vacía → tsr_empty = 1') : 'tx_busy = 1 · tsr_empty = 0')));
+    // cables activos
+    $('wDone').classList.toggle('on', done);
+    $('wDone').setAttribute('marker-end', done?'url(#a4)':'url(#a3)');
+    const sh = S.event==='load'||S.event==='shift'||S.event==='lastData';
+    $('wShift').classList.toggle('on', sh); $('wShift').setAttribute('marker-end', sh?'url(#a4)':'url(#a3)');
+    const ls = S.event==='lastData';
+    $('wLast').classList.toggle('on', ls); $('wLast').setAttribute('marker-end', ls?'url(#a4)':'url(#a3)');
+    const b0 = S.st==='DATA';
+    $('wBit0').classList.toggle('on', b0); $('wBit0').setAttribute('marker-end', b0?'url(#a4)':'url(#a3)');
+
+    drawTSR(); drawTick(done); drawBit(); drawFSM(); drawTrace(); explain(done);
+  }
+
+  function drawTSR(){
+    const s=$('vTSR'); s.innerHTML='';
+    s.appendChild(el('text',{x:2,y:70,class:'tm'}, 'entra 1'));
+    for(let i=7;i>=0;i--){
+      const x=60+(7-i)*50, out = i===0 && S.st==='DATA';
+      const used = S.st==='DATA' ? i <= S.lastBit - S.bit : S.st==='START';
+      s.appendChild(el('rect',{x, y:40, width:44, height:52, rx:6, class:'cell'+(out?' out':''), opacity: used||out?1:.45}));
+      s.appendChild(el('text',{x:x+22, y:74, 'text-anchor':'middle', class:'tb', style:'font-size:22px'+(out?';fill:var(--accent)':'')}, (S.tsr>>i)&1));
+      s.appendChild(el('text',{x:x+22, y:32, 'text-anchor':'middle', class:'tm'}, 'bit '+i));
+    }
+    s.appendChild(el('path',{d:'M462,66 L505,66', class:'wo', 'marker-end':'url(#a2)'}));
+    s.appendChild(el('text',{x:468,y:56,class:'tm'}, 'línea'));
+    for(let i=0;i<7;i++){ const x=60+i*50+44; s.appendChild(el('path',{d:`M${x-8},100 q 13 12 26 0`, class:'wi', 'marker-end':'url(#a3)'})); }
+    s.appendChild(el('text',{x:60,y:150,class:'t'}, `Contenido: 0x${S.tsr.toString(16).toUpperCase().padStart(2,'0')}  ·  sale ahora: ${serial()}${S.st==='DATA'?'':' (no viene del TSR en '+S.st+')'}`));
+  }
+
+  function drawTick(done){
+    const s=$('vTick'); s.innerHTML='';
+    const n=LAST+1, active=S.st!=='IDLE';
+    for(let i=0;i<n;i++){
+      const x=20+i*30, filled = active && i<=S.tc;
+      s.appendChild(el('rect',{x, y:40, width:24, height:40, rx:5, fill: filled? 'var(--accent)':'var(--panel)', stroke: i===LAST?'var(--block-edge)':'var(--line)', 'stroke-width': i===LAST?2:1, 'fill-opacity': filled? (i===S.tc?1:.45):1}));
+      s.appendChild(el('text',{x:x+12, y:98, 'text-anchor':'middle', class:'tm'}, i));
+    }
+    s.appendChild(el('text',{x:20,y:26,class:'tm'}, 'tick_cnt (un cuadro por cada bclk_tick)'));
+    s.appendChild(el('text',{x:20,y:132,class:'t'}, active ? `tick_cnt = ${S.tc}  ·  ¿= ${LAST}?  ${S.tc===LAST?'sí → el próximo tick termina el bit':'no → sigue contando'}` : 'En reposo no cuenta.'));
+    s.appendChild(el('text',{x:20,y:156,class:'tv', style:'font-size:13px'}, done ? '⚑ fin de bit en este tick (vuelve a 0)' : ''));
+  }
+
+  function drawBit(){
+    const s=$('vBit'); s.innerHTML='';
+    s.appendChild(el('text',{x:20,y:26,class:'tm'}, 'bit_cnt: qué bit de datos está saliendo'));
+    for(let i=0;i<=7;i++){
+      const x=20+i*60, cur = S.st==='DATA' && i===S.bit, sent = (S.st==='DATA' && i<S.bit) || S.st==='PARITY' || S.st==='STOP' || (S.st==='IDLE' && S.ticks>0 && S.fifo.length===0);
+      s.appendChild(el('rect',{x, y:40, width:52, height:48, rx:6, fill: cur?'var(--c-data)':'var(--panel)', 'fill-opacity': cur?.9:1, stroke: i===S.lastBit?'var(--block-edge)':'var(--c-data)', 'stroke-width': i===S.lastBit?2.4:1.2, opacity: sent&&!cur? .45:1}));
+      s.appendChild(el('text',{x:x+26, y:62, 'text-anchor':'middle', class:'t', style: cur?'fill:#fff;font-weight:700':''}, 'D'+i));
+      s.appendChild(el('text',{x:x+26, y:80, 'text-anchor':'middle', class:'tm', style: cur?'fill:#fff':''}, (S.byte>>i)&1));
+    }
+    s.appendChild(el('text',{x:20,y:118,class:'tm'}, 'borde grueso = último bit (wls = 11 → D7)'));
+    s.appendChild(el('text',{x:20,y:146,class:'t'}, S.st==='DATA' ? `bit_cnt = ${S.bit}  ·  ¿= ${S.lastBit}?  ${S.bit===S.lastBit?'sí → al terminar pasa a '+(S.pen?'PARITY':'STOP'):'no → al terminar suma 1'}` : 'Fuera de DATA vale 0 y no cuenta.'));
+  }
+
+  function drawFSM(){
+    const s=$('vFSM'); s.innerHTML='';
+    const pos={IDLE:[70,60],START:[260,60],DATA:[450,60],PARITY:[450,175],STOP:[260,175]};
+    const arrow=(a,b,lbl,lx,ly,curve)=>{ const [x1,y1]=pos[a],[x2,y2]=pos[b];
+      const d = curve || `M${x1+(x2>x1?52:x2<x1?-52:0)},${y1+(y2>y1?24:y2<y1?-24:0)} L${x2+(x2>x1?-54:x2<x1?54:0)},${y2+(y2>y1?-26:y2<y1?26:0)}`;
+      s.appendChild(el('path',{d, class:'w', 'marker-end':'url(#a1)'})); s.appendChild(el('text',{x:lx,y:ly,class:'tm','text-anchor':'middle'},lbl)); };
+    arrow('IDLE','START','HAY_DATO · CARGA',165,28);
+    arrow('START','DATA','FIN_BIT',355,48);
+    arrow('DATA','PARITY','',0,0,'M450,84 L450,149'); s.appendChild(el('text',{x:442,y:122,class:'tm','text-anchor':'end'},'FIN_BIT && ULTIMO'));
+    arrow('PARITY','STOP','FIN_BIT',355,165,'M398,175 L314,175');
+    arrow('STOP','IDLE','',0,0,'M206,168 L110,84'); s.appendChild(el('text',{x:168,y:128,class:'tm'},'FIN_BIT, sin dato'));
+    s.appendChild(el('path',{d:'M300,151 L300,98', class:'w', 'marker-end':'url(#a1)', 'stroke-dasharray':'4 3'}));
+    s.appendChild(el('text',{x:308,y:130,class:'tm'},'FIN_BIT && HAY_DATO'));
+    s.appendChild(el('path',{d:'M478,40 q 30 -30 4 -36 q -22 -2 -18 14', class:'w', 'marker-end':'url(#a1)'}));
+    s.appendChild(el('text',{x:500,y:24,class:'tm','text-anchor':'end'},'D0..D7'));
+    Object.entries(pos).forEach(([k,[x,y]])=>{ const on=S.st===k;
+      s.appendChild(el('rect',{x:x-52,y:y-24,width:104,height:48,rx:24, fill: on?stColor[k]:'var(--panel)', 'fill-opacity': on?.92:1, stroke:stColor[k], 'stroke-width': on?3:1.5}));
+      s.appendChild(el('text',{x,y:y+5,'text-anchor':'middle',class:'t',style:on?'fill:#fff;font-weight:700':'font-weight:700'},stName[k]));
+      const outv={IDLE:'SEL=11 → 1',START:'SEL=00 → 0',DATA:'SEL=01 → TSR[0]',PARITY:'SEL=10 → paridad',STOP:'SEL=11 → 1'}[k];
+      s.appendChild(el('text',{x,y:y+38,'text-anchor':'middle',class:'tm'},outv));
+    });
+    s.appendChild(el('text',{x:20,y:222,class:'tm'}, S.pen? '' : 'sin paridad: DATA va directo a STOP'));
+  }
+
+  function drawTrace(){
+    const s=$('vTrace'); s.innerHTML='';
+    const H=S.history.slice(); H.push({st:S.st, v:serial(), bit:S.bit, now:true});
+    const total=Math.max(12*16+20, H.length+4); const px=1000/total;
+    let d='', prev=null;
+    H.forEach((h,i)=>{ const x=i*px, y=h.v?24:84;
+      s.appendChild(el('rect',{x, y:16, width:px+.4, height:76, class:'seg-'+h.st, 'fill-opacity':.14}));
+      if(prev===null) d+=`M${x},${y}`; else if(prev!==h.v) d+=` L${x},${prev?24:84} L${x},${y}`; prev=h.v; });
+    d+=` L${H.length*px},${prev?24:84}`;
+    s.appendChild(el('path',{d, style:'stroke:var(--accent);stroke-width:2.5;fill:none'}));
+    s.appendChild(el('line',{x1:(H.length-0.5)*px,x2:(H.length-0.5)*px,y1:8,y2:100, style:'stroke:var(--ink);stroke-dasharray:3 3'}));
+    // labels per segment
+    let i=0; while(i<H.length){ let j=i; const key=h=>h.st+(h.st==='DATA'?h.bit:''); while(j+1<H.length && key(H[j+1])===key(H[i])) j++;
+      const w=(j-i+1)*px; const lab = H[i].st==='DATA'?'D'+H[i].bit : H[i].st==='START'?'S':H[i].st==='PARITY'?'P':H[i].st==='STOP'?'SP':'';
+      if(lab && w>14) s.appendChild(el('text',{x:i*px+w/2, y:112, 'text-anchor':'middle', class:'tm'}, lab));
+      i=j+1; }
+    s.appendChild(el('text',{x:4,y:12,class:'tm'},'1')); s.appendChild(el('text',{x:4,y:98,class:'tm'},'0'));
+  }
+
+  function explain(done){
+    const ev=S.event;
+    const A = ev==='load' ? `Se cargó 0x${S.tsr.toString(16).toUpperCase().padStart(2,'0')} desde el FIFO. Todavía no sale: primero va el start.`
+            : ev==='shift' ? `Terminó un bit: el TSR se desplazó a la derecha y entró un 1 por la izquierda. Ahora sale D${S.bit}.`
+            : ev==='lastData' ? 'Salió el último bit de datos. El TSR ya no se usa en lo que queda de la trama.'
+            : S.st==='DATA' ? `Quieto: está sacando tsr[0] = ${S.tsr&1} hasta que (b) diga “fin de bit”.`
+            : S.st==='IDLE' ? (S.fifo.length? 'Vacío esperando: en el próximo tick se carga el carácter.' : 'Ya envió todo. No se usa en reposo.')
+            : `En ${S.st} el cable no sale del TSR; el TSR espera.`;
+    const B = S.st==='IDLE' && ev!=='done' ? 'En reposo no cuenta.'
+            : done ? '¡Llegó al final! Avisó “fin de bit” a la FSM y volvió a 0.'
+            : ev==='load' ? 'Empieza en 0 junto con el start.'
+            : `Va en ${S.tc}. Faltan ${LAST-S.tc+1} tick(s) para terminar este bit.`;
+    const C = S.st==='DATA' ? (ev==='shift' ? `Sumó 1: ahora va en D${S.bit}.` : ev==='toData' ? 'Empieza en D0.' : `Está en D${S.bit}. Cambia cuando (b) diga “fin de bit”.`)
+            : ev==='lastData' ? `Era el último (D${S.lastBit}): avisó a la FSM y volvió a 0.` : 'No trabaja en este estado.';
+    const D = {load:'IDLE → START: HAY_DATO y tick, así que CARGA = 1 (sale como tx_pop) y el TSR se carga.', toData:'START → DATOS: (b) activó FIN_BIT.',
+               shift:'Sigue en DATOS: DESPLAZA = 1, así que el TSR se desplaza y (c) suma 1.', lastData:`DATOS → ${stName[S.st]}: FIN_BIT y ULTIMO estaban en 1.`,
+               toStop:'PARIDAD → STOP: (b) activó FIN_BIT.', done:'STOP → IDLE: la fila está vacía, así que vuelve a reposo y tsr_empty sube a 1.',
+               idle:'En IDLE, esperando que haya algo en la fila.', reset:'Arranca en IDLE. Hay una letra en la fila: pulsa +1 tick.'}[ev] || `En ${stName[S.st]}, esperando el próximo FIN_BIT.`;
+    $('whyA').textContent=A; $('whyB').textContent=B; $('whyC').textContent=C; $('whyD').textContent=D;
+  }
+
+  // ------------------------------------------------ controles
+  let timer=null;
+  $('bTick').addEventListener('click',tick);
+  $('bBit').addEventListener('click',nextBit);
+  $('bReset').addEventListener('click',()=>{ stop(); reset(); });
+  $('iByte').addEventListener('change',()=>{ stop(); reset(); });
+  $('iPar').addEventListener('change',()=>{ stop(); reset(); });
+  function stop(){ if(timer){ clearInterval(timer); timer=null; $('bPlay').textContent='▶ Reproducir'; } }
+  $('bPlay').addEventListener('click',()=>{
+    if(timer){ stop(); return; }
+    if(S.st==='IDLE' && !S.fifo.length) reset();
+    $('bPlay').textContent='❚❚ Pausa';
+    timer=setInterval(()=>{ if(S.st==='IDLE' && !S.fifo.length && S.ticks>0){ stop(); return; } tick(); }, 70);
+  });
+  reset();
+  // estado inicial interesante: a mitad de D0
+  for(let i=0;i<1+16+5;i++) tick();
+})();
+</script>
+
+</body></html>

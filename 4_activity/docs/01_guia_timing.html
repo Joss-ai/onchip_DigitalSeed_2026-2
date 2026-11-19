@@ -1,0 +1,976 @@
+<!doctype html>
+<title>UART TX Timing &amp; Control</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna de lectura (~74ch) con bandas anchas para el simulador y los diagramas; estética de hoja de datos / analizador lógico */
+:root{
+  --paper:#F1F3F0; --panel:#FFFFFF; --ink:#17201C; --muted:#5A655F; --line:#CDD4CF;
+  --accent:#A8530A; --accent-soft:#F6E6D6;
+  --c-start:#C92A2A; --c-data:#1864AB; --c-par:#8E33A8; --c-stop:#2B7A3B; --c-idle:#7B8680;
+  --ok:#2B7A3B; --warn:#B35C00;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A;
+  --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#8E9993;
+  --ok:#6FD883; --warn:#F0953A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#111613; --panel:#19201C; --ink:#E3E9E5; --muted:#9AA59F; --line:#2D3832;
+  --accent:#F0953A; --accent-soft:#3A2A1A;
+  --c-start:#FF7676; --c-data:#5AB0F7; --c-par:#D88AF0; --c-stop:#6FD883; --c-idle:#8E9993;
+  --ok:#6FD883; --warn:#F0953A; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:16.5px; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:0 64px}
+.wrap{max-width:1040px; margin:0 auto}
+.read{max-width:74ch}
+h1,h2,h3{font-family:var(--f-display); line-height:1.12; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.1rem, 5.5vw, 3.6rem); font-weight:800; letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem, 3vw, 2rem); font-weight:800; letter-spacing:-.01em}
+h3{font-size:1.15rem; font-weight:600; margin-top:1.6em}
+p{margin:.7em 0}
+code, .mono{font-family:var(--f-mono); font-size:.88em}
+p code, li code, td code{background:var(--accent-soft); padding:.05em .35em; border-radius:4px}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--f-mono); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+header.hero{padding-block:44px 28px; border-bottom:2px solid var(--ink); display:grid; gap:14px}
+.hero .lede{font-size:1.18rem; max-width:62ch; margin:0}
+.hero-trace{width:100%; height:70px; display:block}
+nav.toc{display:flex; flex-wrap:wrap; gap:8px; padding-block:16px; border-bottom:1px solid var(--line)}
+nav.toc a{font-family:var(--f-mono); font-size:.8rem; text-decoration:none; color:var(--ink); border:1px solid var(--line); padding:4px 10px; border-radius:999px; background:var(--panel)}
+nav.toc a:hover, nav.toc a:focus-visible{border-color:var(--accent); color:var(--accent); outline:none}
+section{padding-block:40px 8px; display:grid; gap:12px}
+section > .num{font-family:var(--f-mono); color:var(--muted); font-size:.8rem}
+.callout{border-left:3px solid var(--accent); background:var(--panel); padding:12px 16px; border-radius:0 8px 8px 0}
+.callout strong{color:var(--accent)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+.two > *{min-width:0}
+@media (max-width:760px){ .two{grid-template-columns:1fr} }
+ul{padding-left:1.2em; margin:.5em 0} li{margin:.25em 0}
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--panel)}
+table{border-collapse:collapse; width:100%; font-size:.93rem}
+th,td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-family:var(--f-mono); font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--paper)}
+tr:last-child td{border-bottom:none}
+td.sig{font-family:var(--f-mono); white-space:nowrap; font-weight:600}
+.dir{font-family:var(--f-mono); font-size:.72rem; padding:1px 6px; border-radius:4px; border:1px solid currentColor}
+.dir.in{color:var(--c-data)} .dir.out{color:var(--c-stop)}
+.diagram{overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px}
+.diagram svg{display:block; min-width:720px; width:100%; height:auto}
+.svg-box{fill:var(--paper); stroke:var(--line); stroke-width:1.5}
+.svg-me{fill:var(--accent-soft); stroke:var(--accent); stroke-width:2.5}
+.svg-t{fill:var(--ink); font-family:var(--f-body); font-size:13px}
+.svg-tb{fill:var(--ink); font-family:var(--f-display); font-weight:600; font-size:15px}
+.svg-m{fill:var(--muted); font-family:var(--f-mono); font-size:11px}
+.svg-w{stroke:var(--ink); stroke-width:1.6; fill:none}
+.svg-wa{stroke:var(--accent); stroke-width:2; fill:none}
+.svg-arrow{fill:var(--ink)} .svg-arrowa{fill:var(--accent)}
+
+/* frame strip */
+.strip{display:flex; flex-wrap:wrap; gap:3px; font-family:var(--f-mono); font-size:.78rem}
+.cell{min-width:44px; text-align:center; border-radius:5px; padding:4px 4px 3px; border:1.5px solid; background:var(--panel)}
+.cell b{display:block; font-size:1.05rem}
+.cell.idle{border-color:var(--c-idle); color:var(--c-idle)}
+.cell.start{border-color:var(--c-start); color:var(--c-start)}
+.cell.data{border-color:var(--c-data); color:var(--c-data)}
+.cell.par{border-color:var(--c-par); color:var(--c-par)}
+.cell.stop{border-color:var(--c-stop); color:var(--c-stop)}
+
+/* simulator */
+.sim{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:grid; gap:14px}
+.controls{display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:10px 14px}
+.ctl{display:grid; gap:3px; font-size:.85rem}
+.ctl label, .ctl .lbl{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.05em; color:var(--muted); text-transform:uppercase}
+select, input[type=text], input[type=number]{font:inherit; font-family:var(--f-mono); font-size:.88rem; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--paper); color:var(--ink); width:100%}
+.chk{display:flex; align-items:center; gap:8px; font-size:.88rem; cursor:pointer}
+.chk input{accent-color:var(--accent); width:16px; height:16px}
+input:focus-visible, select:focus-visible, button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.btn{font:inherit; font-family:var(--f-mono); font-size:.8rem; border:1px solid var(--ink); background:var(--ink); color:var(--paper); padding:6px 12px; border-radius:6px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:hover{opacity:.85}
+.bar{display:flex; flex-wrap:wrap; align-items:center; gap:10px}
+.bar input[type=range]{flex:1; min-width:160px; accent-color:var(--accent)}
+.wave{overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--paper)}
+.wave svg{display:block}
+.w-lbl{fill:var(--muted); font-family:var(--f-mono); font-size:11px}
+.w-sig{stroke:var(--ink); stroke-width:1.6; fill:none}
+.w-tick{stroke:var(--muted); stroke-width:1}
+.w-pop{stroke:var(--accent); stroke-width:2; fill:none}
+.w-grid{stroke:var(--line); stroke-width:1}
+.w-cur{stroke:var(--accent); stroke-width:1.5; stroke-dasharray:4 3}
+.seg-START{fill:var(--c-start)} .seg-DATA{fill:var(--c-data)} .seg-PARITY{fill:var(--c-par)} .seg-STOP{fill:var(--c-stop)} .seg-IDLE{fill:var(--c-idle)}
+.seg{fill-opacity:.16; stroke-width:1.2}
+.segs-START{stroke:var(--c-start)} .segs-DATA{stroke:var(--c-data)} .segs-PARITY{stroke:var(--c-par)} .segs-STOP{stroke:var(--c-stop)} .segs-IDLE{stroke:var(--c-idle)}
+.w-txt{fill:var(--ink); font-family:var(--f-mono); font-size:10.5px}
+.inspector{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px}
+.insp{border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:var(--paper); min-width:0}
+.insp .k{font-family:var(--f-mono); font-size:.7rem; letter-spacing:.06em; color:var(--muted); text-transform:uppercase}
+.insp .v{font-family:var(--f-mono); font-size:1.05rem; font-weight:600; font-variant-numeric:tabular-nums}
+.tsr{display:flex; gap:3px; margin-top:4px}
+.tsr span{width:26px; height:28px; display:grid; place-items:center; border:1px solid var(--line); border-radius:4px; font-family:var(--f-mono); font-size:.85rem; background:var(--panel)}
+.tsr span.out{border-color:var(--accent); background:var(--accent-soft); color:var(--accent); font-weight:600}
+.tsr span.dim{opacity:.35}
+.why{font-size:.95rem; border-left:3px solid var(--accent); padding:6px 12px; background:var(--paper); border-radius:0 6px 6px 0}
+
+/* code */
+.code{position:relative; background:var(--panel); border:1px solid var(--line); border-radius:10px}
+.code pre{margin:0; padding:14px 16px; overflow-x:auto; font-family:var(--f-mono); font-size:.8rem; line-height:1.55; tab-size:2}
+.code .copy{position:absolute; top:8px; right:8px}
+.code .fname{font-family:var(--f-mono); font-size:.72rem; color:var(--muted); padding:8px 16px 0}
+details{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 14px}
+details + details{margin-top:8px}
+summary{cursor:pointer; font-weight:700}
+details p{margin:.5em 0 .2em}
+.prop-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
+.prop{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 14px; min-width:0}
+.prop .tag{font-family:var(--f-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase}
+.tag.assume{color:var(--c-data)} .tag.assert{color:var(--c-start)} .tag.cover{color:var(--c-stop)}
+.prop p{margin:.35em 0 0; font-size:.93rem}
+.baud{display:flex; flex-wrap:wrap; gap:12px; align-items:end}
+.baud .ctl{width:150px}
+.baud .res{font-family:var(--f-mono); font-size:1rem; padding:6px 0}
+footer{margin-top:40px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">UART · bloque 4 de 6 · Transmitter Timing and Control</div>
+  <h1>Transmitter Timing &amp; Control</h1>
+  <p class="lede">Toma un carácter en paralelo del TX FIFO, lo mete en el <b>TSR</b> (Transmitter Shift Register) y lo saca bit a bit por el pin <code>txd</code>: start, datos (LSB primero), paridad y stop, cada bit durante exactamente 16 (o 13) pulsos de <code>bclk_tick</code>.</p>
+  <svg class="hero-trace" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-label="Trama UART del carácter A, 8N1">
+    <g id="heroTrace"></g>
+  </svg>
+</header>
+
+<nav class="toc" aria-label="Secciones">
+  <a href="#idea">La idea</a><a href="#contexto">Dónde vive</a><a href="#interfaz">Interfaz</a><a href="#trama">Formato de trama</a><a href="#tiempo">Tiempo y ticks</a><a href="#fsm">FSM</a><a href="#sim">Simulador</a><a href="#casos">Casos especiales</a><a href="#rtl">RTL</a><a href="#formal">Verificación formal</a><a href="#examen">Autoevaluación</a>
+</nav>
+
+<!-- 1 -->
+<section id="idea">
+  <div class="num">01</div>
+  <h2>La idea en 30 segundos</h2>
+  <div class="read">
+    <p>La CPU escribe bytes en el THR y esos bytes quedan en el TX FIFO (eso lo hace tu compañero). Tu bloque es el que <b>convierte paralelo en serie</b> y decide <b>cuándo</b> cambia la línea. Piensa en él como tres piezas pequeñas que trabajan juntas:</p>
+    <ul>
+      <li><b>El TSR</b>, un registro de 8 bits que se desplaza a la derecha. El bit 0 es el que está en la línea en cada momento.</li>
+      <li><b>Un contador de ticks</b> que cuenta pulsos de <code>bclk_tick</code> (que vienen del Baud generator) para que cada bit dure 16 ticks (o 13 con <code>osm_sel=1</code>).</li>
+      <li><b>Una máquina de estados</b> <code>IDLE → START → DATA → PARITY → STOP</code> que decide qué va en la línea según el LCR (longitud de palabra, paridad, stop bits, break).</li>
+    </ul>
+    <div class="callout"><strong>Regla de oro:</strong> la línea en reposo está en <b>1</b> (marca). Un carácter empieza con un <b>0</b> (start) y termina con al menos un <b>1</b> (stop). Todo lo demás es contar ticks y saber qué bit toca.</div>
+    <h3>Lo que este bloque NO hace</h3>
+    <ul>
+      <li>No divide el reloj: el <code>bclk_tick</code> ya llega hecho del Divisor latch / Baud generator.</li>
+      <li>No guarda la cola de caracteres: eso es el Transmitter FIFO. Tú solo pides el siguiente con <code>tx_pop</code>.</li>
+      <li>No decodifica direcciones ni guarda LCR/MCR: eso es Control Logic. A ti te llegan los bits ya separados.</li>
+      <li>No genera la interrupción THRE ni el evento DMA: eso es Interrupt/Event control. Tú solo provocas que el FIFO se vacíe.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="contexto">
+  <div class="num">02</div>
+  <h2>Dónde vive dentro de la UART</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 980 360" role="img" aria-label="Diagrama de bloques del transmisor">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="svg-arrow" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="svg-arrowa" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <!-- blocks -->
+      <rect class="svg-box" x="20" y="140" width="170" height="80" rx="8"/>
+      <text class="svg-tb" x="105" y="174" text-anchor="middle">Transmitter FIFO</text>
+      <text class="svg-m" x="105" y="194" text-anchor="middle">THR / 16 posiciones</text>
+
+      <rect class="svg-box" x="370" y="20" width="240" height="56" rx="8"/>
+      <text class="svg-tb" x="490" y="44" text-anchor="middle">Divisor latch · Baud gen</text>
+      <text class="svg-m" x="490" y="63" text-anchor="middle">bclk_tick = 16× ó 13× baud</text>
+
+      <rect class="svg-box" x="20" y="280" width="250" height="62" rx="8"/>
+      <text class="svg-tb" x="145" y="305" text-anchor="middle">Control Logic</text>
+      <text class="svg-m" x="145" y="324" text-anchor="middle">LCR · MCR · MDR · PWREMU_MGMT</text>
+
+      <rect class="svg-me" x="300" y="115" width="380" height="140" rx="10"/>
+      <text class="svg-tb" x="490" y="140" text-anchor="middle">Transmitter Timing &amp; Control</text>
+      <rect class="svg-box" x="320" y="155" width="100" height="80" rx="6"/>
+      <text class="svg-t" x="370" y="190" text-anchor="middle">FSM</text>
+      <text class="svg-m" x="370" y="208" text-anchor="middle">estado</text>
+      <rect class="svg-box" x="440" y="155" width="100" height="80" rx="6"/>
+      <text class="svg-t" x="490" y="190" text-anchor="middle">tick_cnt</text>
+      <text class="svg-m" x="490" y="208" text-anchor="middle">0..15 / 0..12</text>
+      <rect class="svg-box" x="560" y="155" width="100" height="80" rx="6"/>
+      <text class="svg-t" x="610" y="190" text-anchor="middle">TSR</text>
+      <text class="svg-m" x="610" y="208" text-anchor="middle">8 bits → LSB</text>
+
+      <rect class="svg-box" x="790" y="120" width="170" height="54" rx="8"/>
+      <text class="svg-tb" x="875" y="152" text-anchor="middle">pin TXD</text>
+      <rect class="svg-box" x="790" y="196" width="170" height="54" rx="8"/>
+      <text class="svg-tb" x="875" y="222" text-anchor="middle">Receiver (loop)</text>
+      <text class="svg-m" x="875" y="240" text-anchor="middle">tx_serial_loop</text>
+      <rect class="svg-box" x="740" y="290" width="220" height="52" rx="8"/>
+      <text class="svg-tb" x="850" y="312" text-anchor="middle">LSR · Interrupt · Emu</text>
+      <text class="svg-m" x="850" y="330" text-anchor="middle">TEMT · tx_busy (FREE)</text>
+
+      <text class="svg-m" x="720" y="40">pin CTS#</text>
+      <path class="svg-w" d="M760,48 L760,96 L660,96 L660,115" marker-end="url(#ar)"/>
+
+      <!-- wires -->
+      <path class="svg-w" d="M190,165 L300,165" marker-end="url(#ar)"/>
+      <text class="svg-m" x="196" y="158">tx_data[7:0], tx_empty</text>
+      <path class="svg-wa" d="M300,200 L190,200" marker-end="url(#ara)"/>
+      <text class="svg-m" x="214" y="216" style="fill:var(--accent)">tx_pop</text>
+      <path class="svg-w" d="M490,76 L490,115" marker-end="url(#ar)"/>
+      <text class="svg-m" x="497" y="100">bclk_tick</text>
+      <path class="svg-w" d="M200,280 L200,262 L330,262 L330,255" marker-end="url(#ar)"/>
+      <text class="svg-m" x="206" y="275">wls pen eps sp stb bc · afe loop · osm_sel · utrst</text>
+      <path class="svg-wa" d="M680,147 L790,147" marker-end="url(#ara)"/>
+      <text class="svg-m" x="690" y="140" style="fill:var(--accent)">txd</text>
+      <path class="svg-w" d="M680,222 L790,222" marker-end="url(#ar)"/>
+      <path class="svg-w" d="M640,255 L640,316 L740,316" marker-end="url(#ar)"/>
+      <text class="svg-m" x="648" y="290">tsr_empty, tx_busy</text>
+    </svg>
+  </div>
+  <p class="read" style="color:var(--muted); font-size:.92rem">Las flechas naranjas son las salidas que más vas a verificar: <code>txd</code> (lo que ve el mundo) y <code>tx_pop</code> (lo que ve el FIFO).</p>
+</section>
+
+<!-- 3 -->
+<section id="interfaz">
+  <div class="num">03</div>
+  <h2>Interfaz: cada señal y para qué sirve</h2>
+  <p class="read">Son las señales de vuestra tabla de reparto (UART_Signals). La columna “quién la maneja” te dice con qué compañero tienes que ponerte de acuerdo.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Señal</th><th>Dir</th><th>Quién la maneja / usa</th><th>Qué significa para tu bloque</th></tr></thead>
+    <tbody>
+      <tr><td class="sig">clk, rst</td><td><span class="dir in">in</span></td><td>Sistema</td><td>Reloj del periférico y reset. Todo es síncrono a <code>clk</code>; el tiempo de bit NO es <code>clk</code>, es <code>bclk_tick</code>.</td></tr>
+      <tr><td class="sig">bclk_tick</td><td><span class="dir in">in</span></td><td>Baud generator</td><td>Pulso de 1 ciclo de <code>clk</code>. Llega 16 veces por bit (o 13). Es un <i>enable</i>, no un reloj: tus flip-flops siguen en <code>clk</code>.</td></tr>
+      <tr><td class="sig">osm_sel</td><td><span class="dir in">in</span></td><td>Control Logic (MDR.OSM_SEL)</td><td>0 → 16 ticks por bit (16× oversampling). 1 → 13 ticks por bit (13×).</td></tr>
+      <tr><td class="sig">tx_data[7:0]</td><td><span class="dir in">in</span></td><td>TX FIFO</td><td>El carácter que está en la cabeza del FIFO. Solo es válido si <code>tx_empty=0</code>.</td></tr>
+      <tr><td class="sig">tx_empty</td><td><span class="dir in">in</span></td><td>TX FIFO</td><td>1 = no hay nada que enviar. También se usa fuera para formar THRE y TEMT.</td></tr>
+      <tr><td class="sig">wls[1:0]</td><td><span class="dir in">in</span></td><td>LCR</td><td>Longitud de palabra: 00=5, 01=6, 10=7, 11=8 bits.</td></tr>
+      <tr><td class="sig">pen, eps, sp</td><td><span class="dir in">in</span></td><td>LCR</td><td>Paridad: habilitada / par (even) / “stick”. Ver tabla de paridad abajo.</td></tr>
+      <tr><td class="sig">stb</td><td><span class="dir in">in</span></td><td>LCR</td><td>0 = 1 stop. 1 = 1.5 stop si la palabra es de 5 bits, 2 stop si es de 6, 7 u 8.</td></tr>
+      <tr><td class="sig">bc</td><td><span class="dir in">in</span></td><td>LCR</td><td>Break control: fuerza la salida serie a 0 mientras esté en 1. La FSM sigue contando por debajo.</td></tr>
+      <tr><td class="sig">utrst</td><td><span class="dir in">in</span></td><td>PWREMU_MGMT</td><td>0 = transmisor en reset (IDLE, línea en 1, no pide caracteres). 1 = habilitado.</td></tr>
+      <tr><td class="sig">cts_n</td><td><span class="dir in">in</span></td><td>Pin externo</td><td>Clear To Send, activo en bajo. Asíncrono: se sincroniza con 2 flip-flops. Solo importa si <code>afe=1</code>.</td></tr>
+      <tr><td class="sig">afe</td><td><span class="dir in">in</span></td><td>MCR</td><td>Autoflow. Con <code>afe=1</code>, si <code>cts_n=1</code> no se empieza un carácter nuevo (el que está saliendo termina).</td></tr>
+      <tr><td class="sig">loop</td><td><span class="dir in">in</span></td><td>MCR</td><td>Loopback: la salida serie va al receptor por <code>tx_serial_loop</code> y el pin <code>txd</code> se queda en 1.</td></tr>
+      <tr><td class="sig">txd</td><td><span class="dir out">out</span></td><td>Pin TX</td><td>La línea serie. 1 en reposo, 1 en loopback.</td></tr>
+      <tr><td class="sig">tx_pop</td><td><span class="dir out">out</span></td><td>TX FIFO</td><td>Pulso de 1 ciclo: “ya cargué la cabeza en el TSR, avanza”. Es el <code>pop</code> del FIFO.</td></tr>
+      <tr><td class="sig">tsr_empty</td><td><span class="dir out">out</span></td><td>Control Logic (LSR)</td><td>1 cuando no hay carácter en el TSR. <code>TEMT = tx_empty &amp; tsr_empty</code>.</td></tr>
+      <tr><td class="sig">tx_serial_loop</td><td><span class="dir out">out</span></td><td>Receiver T&amp;C</td><td>La misma salida serie (con break aplicado), para que el RX la reciba en loopback.</td></tr>
+      <tr><td class="sig">tx_busy</td><td><span class="dir out">out</span></td><td>Emulación (FREE)</td><td>1 mientras sale un carácter. Si el depurador detiene el chip con FREE=0, la UART para cuando termina el carácter en curso.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 4 -->
+<section id="trama">
+  <div class="num">04</div>
+  <h2>Formato de trama</h2>
+  <div class="read">
+    <p>Una trama es siempre: <b>start (0)</b> → <b>5 a 8 bits de datos, LSB primero</b> → <b>paridad opcional</b> → <b>1, 1.5 ó 2 stop (1)</b>. Entre tramas la línea puede quedarse en 1 todo el tiempo que quiera (idle).</p>
+  </div>
+  <div class="two">
+    <div class="tablewrap"><table>
+      <thead><tr><th>PEN</th><th>EPS</th><th>SP</th><th>Bit de paridad</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>x</td><td>x</td><td>No hay bit de paridad</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td>Impar: total de unos (datos + paridad) impar</td></tr>
+        <tr><td>1</td><td>1</td><td>0</td><td>Par: total de unos (datos + paridad) par</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>Stick: siempre 1</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>Stick: siempre 0</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>WLS</th><th>Bits</th><th>STB=0</th><th>STB=1</th></tr></thead>
+      <tbody>
+        <tr><td>00</td><td>5</td><td>1 stop</td><td>1.5 stop</td></tr>
+        <tr><td>01</td><td>6</td><td>1 stop</td><td>2 stop</td></tr>
+        <tr><td>10</td><td>7</td><td>1 stop</td><td>2 stop</td></tr>
+        <tr><td>11</td><td>8</td><td>1 stop</td><td>2 stop</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="read">
+    <p>Cálculo útil: la paridad par es <code>^dato</code> (el XOR de los bits de datos usados). La impar es <code>~^dato</code>. Con WLS menor que 8, solo cuentan los bits bajos: para 5 bits, <code>^(dato &amp; 8'h1F)</code>.</p>
+    <p>Ejemplo: <code>0x41</code> = 'A' = <code>0100_0001</code>. Sale por la línea como <code>0</code> (start), luego <code>1 0 0 0 0 0 1 0</code> (de D0 a D7) y <code>1</code> (stop). Tiene dos unos, así que con paridad par el bit de paridad es 0 y con impar es 1.</p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="tiempo">
+  <div class="num">05</div>
+  <h2>Tiempo: clk, bclk_tick y el tiempo de bit</h2>
+  <div class="read">
+    <p>Hay tres escalas de tiempo y conviene no mezclarlas:</p>
+    <ul>
+      <li><b>clk</b>: el reloj del periférico. Tus registros cambian aquí.</li>
+      <li><b>bclk_tick</b>: un pulso cada <i>divisor</i> ciclos de clk. Frecuencia = 16 × baud (o 13 × baud).</li>
+      <li><b>Tiempo de bit</b>: 16 ticks (o 13). Es lo que mide el receptor del otro lado.</li>
+    </ul>
+    <p>Fórmula del manual de TI: <code>baud = f_clk_uart / (divisor × 16)</code> con <code>osm_sel=0</code>, o <code>/(divisor × 13)</code> con <code>osm_sel=1</code>. El receptor usa los ticks para muestrear en el centro del bit (ciclo 8 ó 6). El transmisor solo los usa para <b>medir duración</b>, por eso a ti te basta con contar.</p>
+    <p>Duración de 1.5 stop: con 16× son 24 ticks exactos. Con 13× serían 19.5, que no existe; el RTL de abajo usa 19 (elección de diseño, documéntala en el informe). 2 stop = 32 ó 26 ticks.</p>
+  </div>
+  <div class="sim" style="max-width:74ch">
+    <div class="eyebrow">Calculadora rápida</div>
+    <div class="baud">
+      <div class="ctl"><label for="bf">f_clk (MHz)</label><input id="bf" type="number" value="48" step="any" min="0.1"></div>
+      <div class="ctl"><label for="bd">divisor</label><input id="bd" type="number" value="26" min="1" step="1"></div>
+      <div class="ctl"><label for="bo">osm_sel</label><select id="bo"><option value="0">0 (16×)</option><option value="1">1 (13×)</option></select></div>
+      <div class="res" id="bres"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="fsm">
+  <div class="num">06</div>
+  <h2>La máquina de estados</h2>
+  <div class="two">
+    <div style="min-width:0">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> IDLE
+  IDLE --> START: tick y hay dato y CTS ok / tx_pop
+  START --> DATA: fin de bit
+  DATA --> DATA: fin de bit y bit_cnt menor que last
+  DATA --> PARITY: fin de bit, último, pen=1
+  DATA --> STOP: fin de bit, último, pen=0
+  PARITY --> STOP: fin de bit
+  STOP --> START: fin de stop y hay dato / tx_pop
+  STOP --> IDLE: fin de stop y no hay dato
+</pre>
+    </div>
+    <div class="read" style="min-width:0">
+      <p><b>“fin de bit”</b> significa: llega un <code>bclk_tick</code> y <code>tick_cnt</code> ya vale el último valor del bit (15 con 16×, 12 con 13×; en STOP, 15/23/31 ó 12/18/25).</p>
+      <p><b>Qué sale por la línea en cada estado</b>:</p>
+      <ul>
+        <li><code>IDLE</code> → 1</li>
+        <li><code>START</code> → 0</li>
+        <li><code>DATA</code> → <code>tsr[0]</code>; al final de cada bit, <code>tsr &lt;= {1, tsr[7:1]}</code></li>
+        <li><code>PARITY</code> → bit de paridad calculado al cargar</li>
+        <li><code>STOP</code> → 1</li>
+      </ul>
+      <p>Después, <code>bc</code> fuerza 0 y <code>loop</code> fuerza el pin a 1.</p>
+      <p><b>Detalle clave:</b> la carga (<code>tx_pop</code>) se hace en un ciclo con <code>bclk_tick=1</code>, y a la vez se <b>capturan</b> WLS, PEN, la paridad ya calculada, STB y OSM. Si la CPU cambia el LCR a mitad de un carácter, ese carácter no se corrompe. Y para la verificación formal esto es oro, como verás en la sección 10.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="sim">
+  <div class="num">07</div>
+  <h2>Simulador ciclo a ciclo</h2>
+  <p class="read">Este simulador ejecuta el mismo algoritmo que el RTL de la sección 9. La CPU escribe los bytes en el FIFO en el ciclo 4. Mueve el cursor (o haz clic en las ondas) para ver el estado interno en cada ciclo de <code>clk</code>.</p>
+  <div class="sim">
+    <div class="controls">
+      <div class="ctl"><label for="s_bytes">Bytes en el FIFO (hex)</label><input id="s_bytes" type="text" value="41 C3"></div>
+      <div class="ctl"><label for="s_wls">WLS</label><select id="s_wls"><option value="0">00 · 5 bits</option><option value="1">01 · 6 bits</option><option value="2">10 · 7 bits</option><option value="3" selected>11 · 8 bits</option></select></div>
+      <div class="ctl"><label for="s_par">Paridad (PEN/EPS/SP)</label><select id="s_par"><option value="none">Sin paridad</option><option value="odd">Impar (1/0/0)</option><option value="even" selected>Par (1/1/0)</option><option value="s1">Stick 1 (1/0/1)</option><option value="s0">Stick 0 (1/1/1)</option></select></div>
+      <div class="ctl"><label for="s_stb">STB</label><select id="s_stb"><option value="0">0 · 1 stop</option><option value="1">1 · 1.5 / 2 stop</option></select></div>
+      <div class="ctl"><label for="s_osm">osm_sel</label><select id="s_osm"><option value="0">0 · 16 ticks/bit</option><option value="1">1 · 13 ticks/bit</option></select></div>
+      <div class="ctl"><label for="s_div">clk por tick (divisor)</label><select id="s_div"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+      <div class="ctl"><span class="lbl">Control de línea</span>
+        <label class="chk" for="s_bc"><input id="s_bc" type="checkbox"> BC (break) en bits 3–6</label>
+        <label class="chk" for="s_loop"><input id="s_loop" type="checkbox"> LOOP (loopback)</label>
+      </div>
+      <div class="ctl"><span class="lbl">Flujo / reset</span>
+        <label class="chk" for="s_afe"><input id="s_afe" type="checkbox"> AFE + CTS# alto en bits 5–16</label>
+        <label class="chk" for="s_rst"><input id="s_rst" type="checkbox"> UTRST=0 en bits 6–8</label>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Trama del primer byte con esta configuración</div>
+      <div class="strip" id="strip"></div>
+    </div>
+    <div class="bar">
+      <button class="btn ghost" id="b_prev" type="button">◀ bit</button>
+      <button class="btn ghost" id="b_prevc" type="button">◀ clk</button>
+      <input type="range" id="cursor" min="0" max="100" value="0" aria-label="Ciclo de clk">
+      <button class="btn ghost" id="b_nextc" type="button">clk ▶</button>
+      <button class="btn ghost" id="b_next" type="button">bit ▶</button>
+      <button class="btn" id="b_play" type="button">▶ Reproducir</button>
+      <label class="chk" for="zoom">Zoom <input id="zoom" type="range" min="1" max="10" value="1" style="min-width:90px; flex:0"></label>
+    </div>
+    <div class="wave" id="wave"></div>
+    <div class="inspector" id="insp"></div>
+    <div class="why" id="why"></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="casos">
+  <div class="num">08</div>
+  <h2>Casos especiales (los que preguntan)</h2>
+  <div class="prop-grid">
+    <div class="prop"><b>Tramas consecutivas</b><p>Si al final del último stop el FIFO tiene otro dato, se hace <code>tx_pop</code> en ese mismo tick y se pasa directo a START. No hay ningún ciclo de idle en medio, y <code>tsr_empty</code> nunca sube.</p></div>
+    <div class="prop"><b>Break (BC=1)</b><p>La salida serie se fuerza a 0 sin importar el estado. La FSM sigue avanzando por debajo, así que al bajar BC la línea muestra lo que toque en ese momento. Para un break limpio, el software espera TEMT, pone BC=1, espera y lo quita.</p></div>
+    <div class="prop"><b>Loopback (LOOP=1)</b><p><code>txd</code> = 1 fijo (el mundo exterior ve idle) y la serie va por <code>tx_serial_loop</code> al receptor. La FSM funciona igual. Con loop, TI conecta CTS internamente a RTS; eso suele hacerse en Control Logic, confírmalo con tu compañero.</p></div>
+    <div class="prop"><b>Auto-CTS (AFE=1)</b><p>CTS# se mira solo justo antes de empezar un carácter. Si sube a mitad de uno, ese carácter termina completo y el siguiente espera. Al bajar CTS#, la transmisión sigue en el siguiente tick (más 2 ciclos de sincronizador).</p></div>
+    <div class="prop"><b>UTRST=0</b><p>El transmisor vuelve a IDLE en el siguiente flanco, la línea a 1, y no se pide nada al FIFO. El carácter que estaba saliendo se pierde a mitad. El flanco de subida de UTRST genera UTXEVT, pero eso es del bloque de interrupciones.</p></div>
+    <div class="prop"><b>TEMT y THRE</b><p>THRE (FIFO vacío) puede subir mientras el último carácter aún sale por la línea. TEMT sube solo cuando además termina el stop: <code>tx_empty &amp;&amp; tsr_empty</code>. Por eso existe <code>tsr_empty</code>.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="rtl">
+  <div class="num">09</div>
+  <h2>RTL de referencia (SystemVerilog)</h2>
+  <p class="read">Una implementación compacta y comentada que coincide con el simulador. Úsala para entender, o como punto de partida si te toca implementar. Usa <code>localparam</code> en vez de <code>enum</code> para que Yosys / SymbiYosys la lea sin problemas.</p>
+  <div class="code"><div class="fname">uart_tx_ctrl.sv</div><button class="btn ghost copy" data-copy="rtlsrc" type="button">Copiar</button><pre id="rtlpre"></pre></div>
+</section>
+
+<!-- 10 -->
+<section id="formal">
+  <div class="num">10</div>
+  <h2>Verificación formal de este bloque</h2>
+  <div class="read">
+    <p>Lo que tu curso explica (Gisselquist, SymbiYosys) aplicado aquí: <b>assume</b> las entradas, <b>assert</b> las salidas y el estado interno, <b>cover</b> para demostrar que pasa lo interesante. El solver busca un contraejemplo: una secuencia de entradas que rompa un <code>assert</code>.</p>
+    <div class="callout"><strong>Truco de diseño:</strong> como el bloque captura dato y configuración en <code>tx_pop</code>, casi no necesitas <code>assume</code>. <code>tx_data</code>, <code>wls</code>, <code>bclk_tick</code>, <code>cts_n</code>… pueden ser cualquier cosa en cualquier ciclo y aun así todo debe cumplirse. Menos assumes significa una prueba más fuerte.</div>
+  </div>
+  <h3>Qué propiedades escribir</h3>
+  <div class="prop-grid">
+    <div class="prop"><span class="tag assume">assume</span><p>Empezar en reset: <code>if (!f_past_valid) assume(rst);</code>. Nada más. Si tu compañero del FIFO quiere, se puede añadir que <code>tx_empty</code> no cambie sin push/pop, pero aquí no hace falta.</p></div>
+    <div class="prop"><span class="tag assert">assert · seguridad de línea</span><p>IDLE o STOP sin break → <code>txd==1</code>. START → <code>txd==0</code>. <code>loop</code> → <code>txd==1</code>. <code>bc &amp;&amp; !loop</code> → <code>txd==0</code>.</p></div>
+    <div class="prop"><span class="tag assert">assert · tx_pop legal</span><p>Si <code>tx_pop</code>: FIFO no vacío, <code>utrst</code>, tick, CTS permitido y el TSR libre (IDLE o último tick del stop). Nunca dos pops seguidos.</p></div>
+    <div class="prop"><span class="tag assert">assert · datos correctos</span><p>Registro sombra <code>f_data</code> capturado en <code>tx_pop</code>. En DATA: <code>serial == f_data[bit_cnt]</code>. Esto demuestra LSB primero y que ningún bit se pierde.</p></div>
+    <div class="prop"><span class="tag assert">assert · paridad</span><p>Escrita como <i>especificación</i>, no copiando el RTL: par → <code>^{par, datos}==0</code>; impar → <code>==1</code>; stick → <code>par == !eps</code>.</p></div>
+    <div class="prop"><span class="tag assert">assert · temporización</span><p>Sin tick, nada cambia (<code>$past</code>). El estado solo avanza en un tick con <code>tick_cnt</code> en su último valor. Con tick y sin fin de bit, <code>tick_cnt</code> sube en 1. Juntas, prueban que cada bit dura 16/13 ticks.</p></div>
+    <div class="prop"><span class="tag assert">assert · invariantes (inducción)</span><p>Contadores en rango, <code>bit_cnt==0</code> fuera de DATA, y el contenido del TSR como función de <code>f_data</code> y <code>bit_cnt</code>. Sin estas, la inducción falla con estados “imposibles”.</p></div>
+    <div class="prop"><span class="tag assert">assert · reset</span><p>Si en el ciclo anterior <code>rst</code> o <code>!utrst</code>, ahora <code>state==IDLE</code>. Y siempre <code>tsr_empty == (state==IDLE)</code>, <code>tx_busy == !tsr_empty</code>.</p></div>
+    <div class="prop"><span class="tag cover">cover</span><p>Una trama 8N1 completa; dos tramas consecutivas (STOP → START); una trama con paridad, 2 stop y 13×. Si un cover no se alcanza, hay una propiedad o assume demasiado fuerte.</p></div>
+  </div>
+  <h3>Por qué la inducción necesita invariantes</h3>
+  <div class="read">
+    <p>BMC (bounded model checking) parte del reset y prueba N pasos. La inducción (<code>mode prove</code>) parte de <b>cualquier</b> estado que cumpla los asserts durante k pasos. Si no dices que, por ejemplo, en IDLE <code>tick_cnt==0</code>, o que en DATA <code>tsr</code> es <code>f_data</code> desplazado <code>bit_cnt</code> veces, el solver arranca en un estado inalcanzable y te da un contraejemplo falso. La solución es añadir un <code>assert</code> que describa ese estado; no un <code>assume</code>.</p>
+    <p>Profundidad del <code>cover</code>: una trama 8N1 con un tick por ciclo dura unos 160 ciclos, así que el cover necesita una profundidad de unos 200. Si es lento, usa <code>divisor=1</code> (tick siempre activo) y <code>osm_sel=1</code> en una tarea aparte.</p>
+  </div>
+  <div class="code"><div class="fname">uart_tx_ctrl.sv · bloque `ifdef FORMAL (va antes de endmodule)</div><button class="btn ghost copy" data-copy="fsrc" type="button">Copiar</button><pre id="fpre"></pre></div>
+  <div class="code"><div class="fname">uart_tx_ctrl.sby · ejecutar con: sby -f uart_tx_ctrl.sby</div><button class="btn ghost copy" data-copy="sbysrc" type="button">Copiar</button><pre id="sbypre"></pre></div>
+  <p class="read" style="color:var(--muted); font-size:.92rem">El RTL y las propiedades se escribieron con cuidado para que encajen entre sí, pero no se ejecutaron con SymbiYosys aquí. Córrelo tú: si alguna inducción falla, el contraejemplo (.vcd) te dirá qué invariante falta.</p>
+</section>
+
+<!-- 11 -->
+<section id="examen">
+  <div class="num">11</div>
+  <h2>Autoevaluación</h2>
+  <p class="read">Intenta responder antes de abrir cada una.</p>
+  <div class="read">
+    <details><summary>¿Cuántos ciclos de clk dura un bit con divisor=26 y osm_sel=0?</summary><p>16 ticks × 26 clk = 416 ciclos de clk.</p></details>
+    <details><summary>WLS=00 y STB=1: ¿cuántos stop bits?</summary><p>1.5 (24 ticks con 16×). Con WLS de 6, 7 u 8 bits y STB=1 serían 2.</p></details>
+    <details><summary>Se transmite 0xC3 en 8 bits con paridad par. ¿Qué bits salen, en orden?</summary><p>0xC3 = 1100_0011. Start 0 → 1 1 0 0 0 0 1 1 (D0..D7) → paridad: hay 4 unos, número par, así que el bit es 0 → stop 1.</p></details>
+    <details><summary>PEN=1, EPS=0, SP=1. ¿Qué vale el bit de paridad?</summary><p>Siempre 1 (stick parity), sin importar el dato.</p></details>
+    <details><summary>AFE=1 y CTS# sube a mitad del bit D3. ¿Qué pasa?</summary><p>El carácter actual termina completo (D3..stop). El siguiente no empieza: no hay <code>tx_pop</code> mientras CTS# siga en 1.</p></details>
+    <details><summary>¿Por qué THRE puede ser 1 mientras la línea todavía se mueve?</summary><p>THRE mira el FIFO/THR. El último carácter ya está en el TSR, así que el FIFO está vacío pero el TSR no. Para eso existe TEMT = <code>tx_empty &amp;&amp; tsr_empty</code>.</p></details>
+    <details><summary>¿Por qué <code>txd==1</code> en IDLE es un assert y no un assume?</summary><p>Porque <code>txd</code> es una salida del diseño: es lo que queremos demostrar. Los assumes son para entradas (el entorno). Si asumieras una salida, estarías escondiendo un bug.</p></details>
+    <details><summary>¿Por qué no hace falta asumir que <code>tx_data</code> es estable?</summary><p>Porque el diseño lo copia al TSR en el ciclo de <code>tx_pop</code> y después no lo vuelve a mirar. El registro sombra <code>f_data</code> captura el mismo valor, y comparamos contra él.</p></details>
+    <details><summary>¿Qué es <code>f_past_valid</code> y por qué se usa con <code>$past</code>?</summary><p>En el primer ciclo <code>$past(x)</code> no tiene valor definido. <code>f_past_valid</code> vale 0 solo en el ciclo 0, así que las propiedades con <code>$past</code> se protegen con <code>if (f_past_valid)</code>.</p></details>
+    <details><summary>La inducción falla con <code>tick_cnt=37</code> en DATA. ¿Qué haces?</summary><p>Es un estado inalcanzable. Añades el invariante <code>assert(tick_cnt &lt;= l_bit_last)</code> (y el de STOP). No se “arregla” con un assume.</p></details>
+  </div>
+</section>
+
+<footer>Basado en vuestra tabla de señales (UART_Signals), la clase de verificación formal (assume/assert/$past, SymbiYosys) y el curso de Gisselquist. Los nombres de registros (LCR, MCR, MDR.OSM_SEL, PWREMU_MGMT.UTRST) siguen la UART de TI tipo 16550.</footer>
+</div>
+
+<script type="text/plain" id="rtlsrc">// ============================================================================
+// Transmitter Timing and Control  (UART tipo 16550 / TI KeyStone)
+// Convierte el carácter del TX FIFO en una trama serie por txd.
+// ============================================================================
+module uart_tx_ctrl (
+  input  logic       clk,
+  input  logic       rst,          // reset síncrono, activo en alto
+  input  logic       bclk_tick,    // pulso de 1 clk a 16x/13x el baud (Baud gen)
+  input  logic       osm_sel,      // MDR: 0 = 16 ticks/bit, 1 = 13 ticks/bit
+  input  logic [7:0] tx_data,      // cabeza del TX FIFO
+  input  logic       tx_empty,     // TX FIFO vacío
+  input  logic [1:0] wls,          // LCR: 00=5 01=6 10=7 11=8 bits
+  input  logic       pen,          // LCR: paridad habilitada
+  input  logic       eps,          // LCR: 1 = par, 0 = impar
+  input  logic       sp,           // LCR: stick parity
+  input  logic       stb,          // LCR: bits de stop
+  input  logic       bc,           // LCR: break control
+  input  logic       utrst,        // PWREMU_MGMT: 1 = TX habilitado
+  input  logic       cts_n,        // pin CTS# (asíncrono)
+  input  logic       afe,          // MCR: autoflow (auto-CTS)
+  input  logic       loop,         // MCR: loopback
+  output logic       txd,          // pin TX
+  output logic       tx_pop,       // pop al TX FIFO (1 ciclo)
+  output logic       tsr_empty,    // TSR vacío (para TEMT)
+  output logic       tx_serial_loop,
+  output logic       tx_busy
+);
+  localparam logic [2:0] IDLE = 3'd0, START = 3'd1, DATA = 3'd2,
+                         PARITY = 3'd3, STOP = 3'd4;
+
+  logic [2:0] state;
+  logic [7:0] tsr;          // Transmitter Shift Register
+  logic [2:0] bit_cnt;      // índice del bit de datos que está saliendo
+  logic [5:0] tick_cnt;     // ticks transcurridos dentro del bit actual
+
+  // Configuración capturada en tx_pop (el LCR puede cambiar a mitad de trama)
+  logic [2:0] l_last;       // índice del último bit de datos: 4..7
+  logic       l_pen;
+  logic       l_par;        // bit de paridad ya calculado
+  logic [5:0] l_bit_last;   // ticks por bit - 1       : 15 ó 12
+  logic [5:0] l_stop_last;  // ticks del stop - 1      : 15/23/31 ó 12/18/25
+
+  // ---------------- Sincronizador de CTS# (pin asíncrono) -------------------
+  logic cts_n_m, cts_n_s;
+  always_ff @(posedge clk)
+    if (rst) {cts_n_s, cts_n_m} <= 2'b11;
+    else     {cts_n_s, cts_n_m} <= {cts_n_m, cts_n};
+
+  // ---------------- Valores que se capturan al cargar ------------------------
+  logic [7:0] mask;
+  always_comb
+    case (wls)
+      2'b00:   mask = 8'h1F;
+      2'b01:   mask = 8'h3F;
+      2'b10:   mask = 8'h7F;
+      default: mask = 8'hFF;
+    endcase
+
+  logic       par_xor, par_bit;
+  logic [5:0] tpb_last, stop_last;
+  assign par_xor   = ^(tx_data & mask);                    // 1 = nº impar de unos
+  assign par_bit   = sp  ? ~eps                            // stick: EPS=0 -> 1, EPS=1 -> 0
+                   : eps ? par_xor                         // par
+                   :       ~par_xor;                       // impar
+  assign tpb_last  = osm_sel ? 6'd12 : 6'd15;
+  assign stop_last = !stb           ? tpb_last                          // 1 stop
+                   : (wls == 2'b00) ? (osm_sel ? 6'd18 : 6'd23)         // 1.5 stop
+                   :                  (osm_sel ? 6'd25 : 6'd31);        // 2 stop
+
+  // ---------------- Control ---------------------------------------------------
+  logic bit_done, can_start, slot_free;
+  assign bit_done  = bclk_tick &&
+                     (tick_cnt == ((state == STOP) ? l_stop_last : l_bit_last));
+  assign can_start = !tx_empty && !(afe && cts_n_s);
+  assign slot_free = (state == IDLE) || (state == STOP && bit_done);
+  assign tx_pop    = !rst && utrst && bclk_tick && slot_free && can_start;
+
+  always_ff @(posedge clk) begin
+    if (rst || !utrst) begin
+      state       <= IDLE;
+      tsr         <= 8'hFF;
+      bit_cnt     <= 3'd0;
+      tick_cnt    <= 6'd0;
+      l_last      <= 3'd7;
+      l_pen       <= 1'b0;
+      l_par       <= 1'b1;
+      l_bit_last  <= 6'd15;
+      l_stop_last <= 6'd15;
+    end else if (tx_pop) begin                 // cargar TSR y empezar el START
+      state       <= START;
+      tsr         <= tx_data;
+      bit_cnt     <= 3'd0;
+      tick_cnt    <= 6'd0;
+      l_last      <= {1'b1, wls};              // 4 + wls
+      l_pen       <= pen;
+      l_par       <= par_bit;
+      l_bit_last  <= tpb_last;
+      l_stop_last <= stop_last;
+    end else if (bclk_tick && state != IDLE) begin
+      if (!bit_done)
+        tick_cnt <= tick_cnt + 6'd1;
+      else begin
+        tick_cnt <= 6'd0;
+        case (state)
+          START:  state <= DATA;
+          DATA: begin
+            tsr <= {1'b1, tsr[7:1]};           // siguiente bit a tsr[0]
+            if (bit_cnt == l_last) begin
+              bit_cnt <= 3'd0;
+              state   <= l_pen ? PARITY : STOP;
+            end else
+              bit_cnt <= bit_cnt + 3'd1;
+          end
+          PARITY: state <= STOP;
+          STOP:   state <= IDLE;               // si había otro dato, ganó tx_pop
+          default: state <= IDLE;
+        endcase
+      end
+    end
+  end
+
+  // ---------------- Salida serie ---------------------------------------------
+  logic serial;
+  always_comb
+    case (state)
+      START:   serial = 1'b0;
+      DATA:    serial = tsr[0];
+      PARITY:  serial = l_par;
+      default: serial = 1'b1;                  // IDLE y STOP
+    endcase
+
+  assign tx_serial_loop = serial & ~bc;        // break fuerza 0
+  assign txd            = loop ? 1'b1 : tx_serial_loop;
+  assign tsr_empty      = (state == IDLE);
+  assign tx_busy        = ~tsr_empty;
+
+  // `include o pega aquí el bloque `ifdef FORMAL ... `endif
+endmodule
+</script>
+
+<script type="text/plain" id="fsrc">`ifdef FORMAL
+  // ------------------------------------------------------------------ setup
+  reg f_past_valid = 1'b0;
+  always @(posedge clk) f_past_valid <= 1'b1;
+
+  // ASSUME: el único supuesto sobre el entorno es empezar en reset
+  always @(*) if (!f_past_valid) assume(rst);
+
+  // Registros sombra: lo que había en el momento de tx_pop
+  reg [7:0] f_data;
+  reg [1:0] f_wls;
+  reg       f_pen, f_eps, f_sp, f_stb, f_osm;
+  always @(posedge clk)
+    if (tx_pop) begin
+      f_data <= tx_data; f_wls <= wls; f_pen <= pen; f_eps <= eps;
+      f_sp   <= sp;      f_stb <= stb; f_osm <= osm_sel;
+    end
+
+  wire [2:0]  f_last  = {1'b1, f_wls};               // 4..7
+  wire [7:0]  f_mask  = 8'hFF >> (3 - f_wls);        // 1F,3F,7F,FF
+  wire [5:0]  f_bit_l = f_osm ? 6'd12 : 6'd15;
+  wire [5:0]  f_stp_l = !f_stb ? f_bit_l
+                      : (f_wls == 2'b00) ? (f_osm ? 6'd18 : 6'd23)
+                      :                    (f_osm ? 6'd25 : 6'd31);
+  wire [15:0] f_ext   = {8'hFF, f_data};             // para modelar el desplazamiento
+
+  // ------------------------------------------- invariantes de estado/contadores
+  always @(*) begin
+    assert(state <= STOP);
+    assert(l_bit_last == 6'd15 || l_bit_last == 6'd12);
+    if (state == IDLE) assert(tick_cnt == 0);
+    if (state != DATA) assert(bit_cnt == 0);
+    else               assert(bit_cnt <= l_last);
+    if (state == STOP) assert(tick_cnt <= l_stop_last);
+    else               assert(tick_cnt <= l_bit_last);
+  end
+
+  // ------------------------- la configuración capturada es la de la carga
+  always @(*) if (state != IDLE) begin
+    assert(l_last      == f_last);
+    assert(l_pen       == f_pen);
+    assert(l_bit_last  == f_bit_l);
+    assert(l_stop_last == f_stp_l);
+  end
+
+  // ----------------------------------- contenido del TSR (clave para inducción)
+  always @(*)
+    case (state)
+      START:        assert(tsr == f_data);
+      DATA:         assert(tsr == f_ext[bit_cnt +: 8]);
+      PARITY, STOP: assert(tsr == f_ext[(f_last + 4'd1) +: 8]);
+      default: ;
+    endcase
+
+  // --------------------------------------- datos correctos, LSB primero
+  always @(*) if (state == DATA) assert(serial == f_data[bit_cnt]);
+
+  // --------------------------------------- paridad (escrita como especificación)
+  always @(*) if (state != IDLE && f_pen) begin
+    if (f_sp)       assert(l_par == !f_eps);                      // stick
+    else if (f_eps) assert((^{l_par, f_data & f_mask}) == 1'b0);  // par
+    else            assert((^{l_par, f_data & f_mask}) == 1'b1);  // impar
+  end
+  always @(*) if (state == PARITY) assert(f_pen && serial == l_par);
+
+  // --------------------------------------- línea serie
+  always @(*) begin
+    if (loop)       assert(txd == 1'b1);
+    else if (bc)    assert(txd == 1'b0);
+    else if (state == IDLE || state == STOP) assert(txd == 1'b1);
+    else if (state == START)                 assert(txd == 1'b0);
+    assert(tx_serial_loop == (serial & !bc));
+    assert(tsr_empty == (state == IDLE));
+    assert(tx_busy   == !tsr_empty);
+  end
+
+  // --------------------------------------- tx_pop solo cuando es legal
+  always @(*) if (tx_pop) begin
+    assert(!rst && utrst && bclk_tick && !tx_empty);
+    assert(!(afe && cts_n_s));                                    // auto-CTS
+    assert(state == IDLE || (state == STOP && tick_cnt == l_stop_last));
+  end
+
+  // --------------------------------------- propiedades en el tiempo
+  always @(posedge clk) if (f_past_valid) begin
+    // reset / utrst llevan a IDLE
+    if ($past(rst) || !$past(utrst))
+      assert(state == IDLE);
+
+    // después de un pop: START, contador a 0, TSR = dato; y nunca dos pops seguidos
+    if ($past(tx_pop)) begin
+      assert(state == START && tick_cnt == 0 && tsr == $past(tx_data));
+      assert(!tx_pop);
+    end
+
+    // sin tick no cambia nada
+    if (!$past(rst) && $past(utrst) && !$past(bclk_tick))
+      assert(state == $past(state) && tick_cnt == $past(tick_cnt)
+             && bit_cnt == $past(bit_cnt) && tsr == $past(tsr));
+
+    // un bit solo termina en un tick con el contador en su último valor
+    if (!$past(rst) && $past(utrst) && $past(state) != IDLE
+        && (state != $past(state) || bit_cnt != $past(bit_cnt)))
+      assert($past(bclk_tick) && $past(tick_cnt) ==
+             (($past(state) == STOP) ? $past(l_stop_last) : $past(l_bit_last)));
+
+    // con tick y sin fin de bit, el contador avanza exactamente 1
+    if (!$past(rst) && $past(utrst) && $past(bclk_tick) && $past(state) != IDLE
+        && state == $past(state) && bit_cnt == $past(bit_cnt))
+      assert(tick_cnt == $past(tick_cnt) + 6'd1);
+  end
+
+  // --------------------------------------- cover
+  always @(posedge clk) if (f_past_valid && !$past(rst)) begin
+    cover($past(state) == STOP && state == IDLE  && f_last == 7 && !f_pen);  // 8N1
+    cover($past(state) == STOP && state == START);                           // seguidas
+    cover($past(state) == STOP && state == IDLE  && f_pen && f_stb && f_osm);
+  end
+`endif
+</script>
+
+<script type="text/plain" id="sbysrc">[tasks]
+prf
+cvr
+
+[options]
+prf: mode prove
+prf: depth 40
+cvr: mode cover
+cvr: depth 200
+
+[engines]
+smtbmc
+
+[script]
+read -formal uart_tx_ctrl.sv
+prep -top uart_tx_ctrl
+
+[files]
+uart_tx_ctrl.sv
+</script>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  // ---------- code blocks
+  [['rtlsrc','rtlpre'],['fsrc','fpre'],['sbysrc','sbypre']].forEach(([s,p])=>{ $(p).textContent = $(s).textContent.replace(/^\n/,''); });
+  document.querySelectorAll('[data-copy]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const txt = $(b.dataset.copy).textContent.replace(/^\n/,'');
+      const done = ()=>{ b.textContent='Copiado'; setTimeout(()=>b.textContent='Copiar',1400); };
+      try{ navigator.clipboard.writeText(txt).then(done, ()=>selectPre(b)); }catch(e){ selectPre(b); }
+    });
+  });
+  function selectPre(b){ const pre=b.parentElement.querySelector('pre'); const r=document.createRange(); r.selectNodeContents(pre); const s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent='Selecciona y copia'; }
+
+  // ---------- hero trace: 'A' 8N1
+  (function(){
+    const bits=[1,1,0,1,0,0,0,0,0,1,0,1,1,1];
+    const kinds=['IDLE','IDLE','START','DATA','DATA','DATA','DATA','DATA','DATA','DATA','DATA','STOP','IDLE','IDLE'];
+    const w=1000/bits.length; let d=''; let g='';
+    bits.forEach((b,i)=>{ const y=b?12:58; const x=i*w; d+= (i===0?`M${x},${y}`:`L${x},${y}`)+` L${x+w},${y} `;
+      g+=`<rect x="${x}" y="8" width="${w}" height="54" class="seg seg-${kinds[i]}" style="fill-opacity:.10"/>`; });
+    $('heroTrace').innerHTML = g+`<path d="${d}" style="stroke:var(--accent);stroke-width:3;fill:none" vector-effect="non-scaling-stroke"/>`;
+  })();
+
+  // ---------- baud calc
+  function baud(){
+    const f=parseFloat($('bf').value)*1e6, dv=Math.max(1,parseInt($('bd').value)||1), o=+$('bo').value;
+    const n=o?13:16; const b=f/(dv*n);
+    const std=[1200,2400,4800,9600,14400,19200,38400,57600,115200,230400,460800,921600,1500000,3000000];
+    let best=std[0]; std.forEach(s=>{ if(Math.abs(s-b)<Math.abs(best-b)) best=s; });
+    const err=(b-best)/best*100;
+    $('bres').innerHTML = isFinite(b) ? `baud = ${b.toFixed(1)} · más cercano ${best} (${err>=0?'+':''}${err.toFixed(2)} %) · 1 bit = ${n*dv} clk` : '—';
+  }
+  ['bf','bd','bo'].forEach(id=>$(id).addEventListener('input',baud)); baud();
+
+  // ---------- simulator
+  const par = x => { let p=0; while(x){ p^=x&1; x>>=1; } return p; };
+  function cfg(){
+    const bytes = $('s_bytes').value.split(/[\s,]+/).filter(Boolean).map(h=>parseInt(h.replace(/^0x/i,''),16)).filter(v=>!isNaN(v)).slice(0,4).map(v=>v&0xFF);
+    const pm=$('s_par').value;
+    return { bytes: bytes.length?bytes:[0x41], wls:+$('s_wls').value, pen: pm!=='none'?1:0,
+      eps: (pm==='even'||pm==='s0')?1:0, sp: (pm==='s1'||pm==='s0')?1:0, stb:+$('s_stb').value, osm:+$('s_osm').value,
+      D:+$('s_div').value, bc:$('s_bc').checked, loop:$('s_loop').checked, afe:$('s_afe').checked, urst:$('s_rst').checked };
+  }
+  function simulate(c){
+    const tpbLast=c.osm?12:15, stopLast=!c.stb?tpbLast:(c.wls===0?(c.osm?18:23):(c.osm?25:31));
+    const bitClk=(tpbLast+1)*c.D, pushAt=4;
+    let st='IDLE', tsr=0xFF, bit=0, tc=0, lLast=7, lPen=0, lPar=1, lBit=15, lStop=15, ctsM=1, ctsS=1;
+    const fifo=[], rec=[], frames=[]; let lastBusy=0;
+    const maxT = pushAt + c.bytes.length*12*33*c.D + 24*bitClk;
+    for(let t=0; t<maxT; t++){
+      if(t===pushAt) fifo.push(...c.bytes);
+      const tick = (t % c.D) === c.D-1;
+      const bitPos = (t - pushAt)/bitClk;
+      const ctsPin = (c.afe && bitPos>=5 && bitPos<16) ? 1 : 0;
+      const bcNow  = c.bc && bitPos>=3 && bitPos<6;
+      const utrst  = !(c.urst && bitPos>=6 && bitPos<8);
+      const txEmpty = fifo.length===0;
+      const done = tick && st!=='IDLE' && tc===(st==='STOP'?lStop:lBit);
+      const canStart = !txEmpty && !(c.afe && ctsS);
+      const slot = st==='IDLE' || (st==='STOP' && done);
+      const pop = utrst && tick && slot && canStart;
+      const serial = st==='START'?0 : st==='DATA'?(tsr&1) : st==='PARITY'?lPar : 1;
+      const sl = bcNow?0:serial, txd = c.loop?1:sl;
+      rec.push({t,tick,st,bit,tc,tsr,serial,sl,txd,pop,txEmpty,tsrEmpty:st==='IDLE',cts:ctsPin,ctsS,bc:bcNow,utrst,fifo:fifo.slice(),lPar,lLast,lPen,lBit,lStop,frame:frames.length-1});
+      if(st!=='IDLE' || !txEmpty) lastBusy=t;
+      // registers
+      const head=fifo[0];
+      ctsS=ctsM; ctsM=ctsPin;
+      if(!utrst){ st='IDLE'; tsr=0xFF; bit=0; tc=0; }
+      else if(pop){ fifo.shift(); st='START'; tsr=head; bit=0; tc=0; lLast=4+c.wls; lPen=c.pen;
+        const x=par(head & (0xFF>>(3-c.wls))); lPar = c.sp?(c.eps?0:1):(c.eps?x:1-x); lBit=tpbLast; lStop=stopLast; frames.push({t:t+1,byte:head}); }
+      else if(tick && st!=='IDLE'){
+        if(!done) tc++;
+        else { tc=0;
+          if(st==='START') st='DATA';
+          else if(st==='DATA'){ tsr=(tsr>>1)|0x80; if(bit===lLast){ bit=0; st=lPen?'PARITY':'STOP'; } else bit++; }
+          else if(st==='PARITY') st='STOP';
+          else if(st==='STOP') st='IDLE';
+        }
+      }
+      const minEnd = pushAt + ((c.afe||c.urst) ? 18*bitClk : 0);
+      if(t>lastBusy+2*bitClk && fifo.length===0 && st==='IDLE' && t>minEnd) break;
+    }
+    return {rec, frames, bitClk, tpbLast, stopLast};
+  }
+
+  let SIM=null, cur=0, playing=null;
+  function stripFor(c){
+    const b=c.bytes[0], n=5+c.wls; const cells=[];
+    cells.push(['idle','idle',1]); cells.push(['start','S',0]);
+    for(let i=0;i<n;i++) cells.push(['data','D'+i,(b>>i)&1]);
+    if(c.pen){ const x=par(b&(0xFF>>(3-c.wls))); cells.push(['par','P', c.sp?(c.eps?0:1):(c.eps?x:1-x)]); }
+    const stops = !c.stb?'1':(c.wls===0?'1.5':'2');
+    cells.push(['stop','SP×'+stops,1]); cells.push(['idle','idle',1]);
+    $('strip').innerHTML = cells.map(([k,l,v])=>`<div class="cell ${k}">${l}<b>${v}</b></div>`).join('') +
+      `<div class="cell idle" style="border-style:dashed">0x${b.toString(16).toUpperCase().padStart(2,'0')}<b>${n+2+(c.pen?1:0)+(+stops)} bits</b></div>`;
+  }
+
+  function render(){
+    const {rec}=SIM; const N=rec.length;
+    const host=$('wave'); const avail=Math.max(320, host.clientWidth-2);
+    const z=+$('zoom').value; const L=92; const px=Math.max(0.5,(avail-L-10)/N)*z;
+    const W=Math.ceil(L+N*px+10);
+    const rows=[['bclk_tick','tick'],['estado','state'],['tick_cnt','tc'],['txd','txd'],['tx_serial_loop','sl'],['tx_pop','pop'],['tx_empty','txEmpty'],['tsr_empty','tsrEmpty'],['TEMT','temt'],['cts_n','cts'],['utrst','utrst']];
+    const RH=30, H=rows.length*RH+8; const X=t=>L+t*px;
+    let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" id="wsvg">`;
+    rows.forEach(([name,key],ri)=>{
+      const y0=ri*RH+6, yh=y0+5, yl=y0+RH-7;
+      s+=`<text class="w-lbl" x="6" y="${y0+RH/2+3}">${name}</text><line class="w-grid" x1="${L}" x2="${W}" y1="${y0+RH-1}" y2="${y0+RH-1}"/>`;
+      if(key==='tick'){
+        if(px*SIM.rec.length>0){ let d=''; const step = px<1.2 ? Math.ceil(1.2/px) : 1; let cnt=0;
+          rec.forEach(r=>{ if(r.tick){ cnt++; if(cnt%step===0) d+=`M${X(r.t)+px/2},${yl} L${X(r.t)+px/2},${yh+4} `; } });
+          s+=`<path class="w-tick" d="${d}"/>`; }
+      } else if(key==='state' || key==='tc'){
+        let i=0; while(i<N){ let j=i; const v = key==='state' ? stLabel(rec[i]) : rec[i].tc;
+          while(j+1<N && (key==='state'?stLabel(rec[j+1]):rec[j+1].tc)===v) j++;
+          const x1=X(i), x2=X(j+1), w=x2-x1;
+          if(key==='state'){
+            s+=`<rect class="seg seg-${rec[i].st} segs-${rec[i].st}" x="${x1}" y="${yh}" width="${Math.max(w,0.5)}" height="${yl-yh}" rx="2"/>`;
+            if(w>v.length*6.6+4) s+=`<text class="w-txt" x="${x1+w/2}" y="${yl-6}" text-anchor="middle">${v}</text>`;
+          } else {
+            s+=`<rect x="${x1}" y="${yh}" width="${Math.max(w,0.5)}" height="${yl-yh}" style="fill:none;stroke:var(--line)"/>`;
+            if(w>16) s+=`<text class="w-txt" x="${x1+w/2}" y="${yl-6}" text-anchor="middle">${v}</text>`;
+          }
+          i=j+1; }
+      } else {
+        const get = key==='temt' ? (r=>r.txEmpty&&r.tsrEmpty?1:0) : (r=>r[key]?1:0);
+        let d=''; let prev=null;
+        rec.forEach((r,i)=>{ const v=get(r); const y=v?yh:yl; if(prev===null) d+=`M${X(i)},${y}`; else if(v!==prev) d+=` L${X(i)},${prev?yh:yl} L${X(i)},${y}`; prev=v; });
+        d+=` L${X(N)},${prev?yh:yl}`;
+        const cls = (key==='pop')?'w-pop':'w-sig';
+        const sty = key==='txd' ? ' style="stroke:var(--accent);stroke-width:2.2"' : '';
+        s+=`<path class="${cls}" d="${d}"${sty}/>`;
+      }
+    });
+    s+=`<line class="w-cur" id="wcur" x1="${X(cur)+px/2}" x2="${X(cur)+px/2}" y1="0" y2="${H}"/></svg>`;
+    host.innerHTML=s;
+    host._px=px; host._L=L;
+    $('wsvg').addEventListener('click', e=>{ const rect=e.currentTarget.getBoundingClientRect(); const t=Math.floor((e.clientX-rect.left-L)/px); setCur(t); });
+    inspect();
+  }
+  function stLabel(r){ return r.st==='DATA' ? 'D'+r.bit : r.st==='START'?'START': r.st==='PARITY'?'PAR': r.st==='STOP'?'STOP':'IDLE'; }
+
+  function setCur(t){
+    cur=Math.max(0,Math.min(SIM.rec.length-1,t)); $('cursor').value=cur;
+    const host=$('wave'); const px=host._px, L=host._L; const ln=$('wcur');
+    if(ln){ ln.setAttribute('x1',L+cur*px+px/2); ln.setAttribute('x2',L+cur*px+px/2);
+      const x=L+cur*px; if(x<host.scrollLeft+L || x>host.scrollLeft+host.clientWidth-20) host.scrollLeft=Math.max(0,x-host.clientWidth/2); }
+    inspect();
+  }
+  function hex(v){ return '0x'+v.toString(16).toUpperCase().padStart(2,'0'); }
+  function inspect(){
+    const r=SIM.rec[cur]; const c=cfg();
+    const lastTick = r.st==='STOP'?r.lStop:r.lBit;
+    const tsrBits=[]; for(let i=7;i>=0;i--){ const used = r.st==='DATA' ? (i<= r.lLast - r.bit) : (r.st==='START' ? i<=r.lLast : false);
+      tsrBits.push(`<span class="${i===0&&r.st==='DATA'?'out':(used?'':'dim')}">${(r.tsr>>i)&1}</span>`); }
+    $('insp').innerHTML = `
+      <div class="insp"><div class="k">ciclo clk · bclk_tick</div><div class="v">${r.t} · ${r.tick?'1':'0'}</div></div>
+      <div class="insp"><div class="k">estado · bit_cnt</div><div class="v" style="color:var(--c-${({START:'start',DATA:'data',PARITY:'par',STOP:'stop',IDLE:'idle'})[r.st]})">${r.st}${r.st==='DATA'?' · '+r.bit:''}</div></div>
+      <div class="insp"><div class="k">tick_cnt / último</div><div class="v">${r.st==='IDLE'?'0 / —':r.tc+' / '+lastTick}</div></div>
+      <div class="insp"><div class="k">TSR [7:0] (bit 0 = línea)</div><div class="tsr">${tsrBits.join('')}</div></div>
+      <div class="insp"><div class="k">serial · txd · loop</div><div class="v">${r.serial} · ${r.txd} · ${r.sl}</div></div>
+      <div class="insp"><div class="k">TX FIFO</div><div class="v">${r.fifo.length? r.fifo.map(hex).join(' ') : 'vacío'}</div></div>`;
+    $('why').innerHTML = explain(r, lastTick);
+  }
+  function explain(r,lastTick){
+    const left = r.st==='IDLE'?0:(lastTick - r.tc + 1);
+    if(!r.utrst) return '<b>UTRST=0:</b> el transmisor está en reset. La FSM se fuerza a IDLE en cada flanco y no hay <code>tx_pop</code>. El carácter que estaba saliendo se perdió.';
+    if(r.pop) return `<b>tx_pop=1 en este ciclo.</b> Hay un tick, el TSR está libre y el FIFO tiene ${hex(r.fifo[0])}. En el próximo flanco: TSR ← ${hex(r.fifo[0])}, estado ← START, tick_cnt ← 0 y se captura la configuración del LCR.`;
+    let extra='';
+    if(r.bc) extra+=' <b>BC=1</b>: la salida está forzada a 0 aunque la FSM diga otra cosa.';
+    if(cfg().loop) extra+=' <b>LOOP=1</b>: el pin txd queda en 1; la trama va por tx_serial_loop.';
+    switch(r.st){
+      case 'IDLE':
+        if(r.txEmpty) return 'IDLE: el FIFO está vacío, la línea en reposo (1). TEMT = 1.'+extra;
+        if(cfg().afe && r.ctsS) return 'IDLE con datos en el FIFO, pero <b>AFE=1 y CTS# (sincronizado) = 1</b>: no se puede empezar un carácter. Esperando a que CTS# baje.'+extra;
+        return 'IDLE con datos en el FIFO: esperando el próximo <code>bclk_tick</code> para hacer <code>tx_pop</code>.'+extra;
+      case 'START': return `START: la línea en 0 avisa al receptor de que empieza un carácter. Faltan ${left} tick(s) para pasar a D0.`+extra;
+      case 'DATA': return `DATA, bit D${r.bit}: en la línea está tsr[0] = ${r.tsr&1}. Faltan ${left} tick(s); entonces el TSR se desplaza a la derecha (entra un 1 por arriba) y ${r.bit===r.lLast?(r.lPen?'se pasa a PARITY':'se pasa a STOP'):'sale D'+(r.bit+1)}.`+extra;
+      case 'PARITY': return `PARITY: sale el bit de paridad calculado al cargar (${r.lPar}). Faltan ${left} tick(s) para STOP.`+extra;
+      case 'STOP': return `STOP: línea en 1 durante ${r.lStop+1} ticks en total. Faltan ${left}. Al terminar: ${r.fifo.length? (cfg().afe&&r.ctsS?'hay dato, pero CTS# bloquea → IDLE':'hay dato → tx_pop y START directo, sin idle') : 'FIFO vacío → IDLE y sube TEMT'}.`+extra;
+    }
+  }
+  function rebuild(keep){
+    const c=cfg(); stripFor(c); SIM=simulate(c);
+    $('cursor').max=SIM.rec.length-1; if(!keep) cur=Math.min(cur, SIM.rec.length-1);
+    render();
+    if(!keep){ const f=SIM.rec.findIndex(r=>r.st==='DATA'); setCur(f>0?f+3:0); }
+  }
+  ['s_bytes','s_wls','s_par','s_stb','s_osm','s_div','s_bc','s_loop','s_afe','s_rst'].forEach(id=>$(id).addEventListener('input',()=>rebuild(false)));
+  $('zoom').addEventListener('input',()=>{ render(); setCur(cur); });
+  $('cursor').addEventListener('input',e=>setCur(+e.target.value));
+  $('b_prevc').addEventListener('click',()=>setCur(cur-1));
+  $('b_nextc').addEventListener('click',()=>setCur(cur+1));
+  const jumpBit = dir => { const R=SIM.rec; const lab=r=>stLabel(r)+'|'+(r.frame); let i=cur; const v=lab(R[i]);
+    if(dir>0){ while(i<R.length-1 && lab(R[i])===v) i++; } else { while(i>0 && lab(R[i])===v) i--; const v2=lab(R[i]); while(i>0 && lab(R[i-1])===v2) i--; }
+    setCur(i); };
+  $('b_next').addEventListener('click',()=>jumpBit(1));
+  $('b_prev').addEventListener('click',()=>jumpBit(-1));
+  $('b_play').addEventListener('click',()=>{
+    if(playing){ clearInterval(playing); playing=null; $('b_play').textContent='▶ Reproducir'; return; }
+    if(cur>=SIM.rec.length-1) setCur(0);
+    $('b_play').textContent='❚❚ Pausa';
+    const stepSize=Math.max(1,Math.round(SIM.bitClk/16));
+    playing=setInterval(()=>{ if(cur>=SIM.rec.length-1){ clearInterval(playing); playing=null; $('b_play').textContent='▶ Reproducir'; return; } setCur(cur+stepSize); }, 40);
+  });
+  let rz; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>{ render(); setCur(cur); },150); });
+  rebuild(false);
+})();
+</script>
